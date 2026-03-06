@@ -1,0 +1,7 @@
+{
+  "name": "Hifd",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
