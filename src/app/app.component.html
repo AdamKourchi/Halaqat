@@ -1,3 +1,14 @@
 <ion-app>
-  <ion-router-outlet></ion-router-outlet>
+  @if (isReady) {
+    <ion-router-outlet></ion-router-outlet>
+  } @else {
+    <ion-content class="splash-screen">
+      <div class="splash-container">
+        <img src="assets/icon/favicon.png" alt="Hifd Logo" class="splash-logo" />
+        <h1 class="splash-title">Hifd</h1>
+        <ion-spinner name="crescent" color="primary"></ion-spinner>
+        <p class="splash-text">Preparing your Quran experience...</p>
+      </div>
+    </ion-content>
+  }
 </ion-app>

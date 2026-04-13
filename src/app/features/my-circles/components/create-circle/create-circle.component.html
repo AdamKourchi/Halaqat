@@ -1,0 +1,33 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>إنشاء حلقة جديد</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cancel()">إلغاء</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-item>
+    <ion-input label="اسم الحلقة : " [(ngModel)]="circleName" placeholder="أدخل اسم الحلقة..."></ion-input>
+  </ion-item>
+
+
+  <ion-item>
+    <ion-select cancel-text="إلغاء" ok-text="تأكيد" label="نوع الحلقة : " [(ngModel)]="circleType"
+      placeholder="اختر نوع الحلقة">
+      <ion-select-option value="حلقة تحفيظ">حلقة تحفيظ</ion-select-option>
+      <ion-select-option value="حلقة مراجعة">حلقة مراجعة</ion-select-option>
+      <ion-select-option value="حلقة تفسير">حلقة تفسير</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+<ion-toolbar>
+  <ion-button expand="block" (click)="confirm()" [disabled]="!circleName">
+    إنشاء
+  </ion-button>
+</ion-toolbar>
+
+
+</ion-content>
+

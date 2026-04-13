@@ -1,0 +1,48 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>إضافة طالب</ion-title>
+    <ion-buttons slot="end">
+      <ion-button  (click)="cancel()">إلغاء</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-item>
+    <ion-input
+      label="اسم الطالب :"
+      [(ngModel)]="studentName"
+      type="text"
+    ></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-select label="الجنس :"  [(ngModel)]="studentGender">
+      <ion-select-option value="Male">ذكر</ion-select-option>
+      <ion-select-option value="Female">أنثى</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-item>
+    <ion-input
+      label="اسم ولي الأمر :"
+      [(ngModel)]="parentName"
+      type="text"
+    ></ion-input>
+  </ion-item>
+  
+  <ion-item>
+    <ion-input
+      label="رقم التواصل :"
+      [(ngModel)]="parentContact"
+      type="text"
+    ></ion-input>
+  </ion-item>
+
+  <ion-toolbar>
+  <ion-button expand="block" (click)="confirm()" [disabled]="!studentName">
+    إنشاء
+  </ion-button>
+</ion-toolbar>
+
+</ion-content>

@@ -1,0 +1,113 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>حَلَقات</ion-title>
+    <ion-button slot="end" fill="clear" (click)="back()">
+      <ion-icon name="arrow-back"></ion-icon>
+    </ion-button>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" fixed-slot-placement="before">
+  @if (selectionMode) {
+    <div
+      style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 10px;
+      "
+    >
+      <div>
+        <ion-button fill="clear" color="danger" (click)="deleteSelected()">
+          <ion-icon name="trash" slot="icon-only"></ion-icon>
+        </ion-button>
+        <ion-button fill="clear" (click)="shareSelected()">
+          <ion-icon name="share-social" slot="icon-only"></ion-icon>
+        </ion-button>
+        <ion-button fill="clear" color="secondary" (click)="extractSummary()">
+          <ion-icon name="document-text" slot="icon-only"></ion-icon>
+        </ion-button>
+      </div>
+      <ion-button fill="clear" color="medium" (click)="cancelSelection()">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+  } @else {
+    <div
+      style="display: flex; justify-content: space-between; align-items: center"
+    >
+      <div>
+        <p>
+         <span> {{ this.circle?.name }}. </span>
+          <small>{{ this.students.length }}</small>
+        </p>
+        <small>
+          المشرف: <span> {{ this.user?.username }} </span>
+        </small>
+      </div>
+      <ion-button fill="solid" (click)="openCreateStudentModal()">
+        <ion-icon name="add"></ion-icon>
+        إضافة طالب</ion-button
+      >
+    </div>
+  }
+  
+  <ion-segment [value]="filterType" (ionChange)="setFilter($event.detail.value)" scrollable="true" class="ion-margin-bottom ion-margin-top">
+    <ion-segment-button value="all">الكل</ion-segment-button>
+    <ion-segment-button value="Male">ذكور</ion-segment-button>
+    <ion-segment-button value="Female">إناث</ion-segment-button>
+    <ion-segment-button value="graded_today">مُنجَز</ion-segment-button>
+    <ion-segment-button value="not_graded">لَمْ يُسَمِّع بَعْد</ion-segment-button>
+    <ion-segment-button value="no_homework">بدون واجب</ion-segment-button>
+  </ion-segment>
+
+  @for (student of filteredStudents; track $index) {
+    <ion-card
+      button="true"
+      (touchstart)="startPress(student)"
+      (touchend)="endPress()"
+      (touchmove)="endPress()"
+      (mousedown)="startPress(student)"
+      (mouseup)="endPress()"
+      (mouseleave)="endPress()"
+      (click)="onCardClick(student)"
+      [class.selected-card]="selectedStudents.has(student.id!)"
+    >
+      <ion-card-header>
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+          <div>
+            <ion-card-title>{{ student.name }}</ion-card-title>
+            <ion-card-subtitle>{{ student.gender === "Male" ? "ذكر" : "أنثى" }}</ion-card-subtitle>
+          </div>
+          <div>
+            @if (student.has_ungraded_homework) {
+              <ion-badge color="warning">لَمْ يُسَمِّع بَعْد</ion-badge>
+            } @else if (student.is_graded_today) {
+              <ion-badge color="success">مُنجَز</ion-badge>
+            }@else {
+              <ion-badge color="secondary">بدون واجب</ion-badge>
+            }
+          </div>
+        </div>
+      </ion-card-header>
+      <ion-card-content>
+        @if (student.parent_name) {
+          <p>
+            ولي الأمر: {{ student.parent_name }} - {{ student.parent_contact }}
+          </p>
+        } @else {
+          <p>لا توجد بيانات لولي الأمر</p>
+        }
+      </ion-card-content>
+    </ion-card>
+  } @empty {
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>لا يوجد طلاب بهذه المواصفات</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p>لا تتطابق نتائج مع التصفية الحالية</p>
+      </ion-card-content>
+    </ion-card>
+  }
+</ion-content>

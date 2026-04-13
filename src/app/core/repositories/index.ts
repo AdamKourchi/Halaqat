@@ -1,0 +1,8 @@
+export { BaseRepository }                    from './base.repository';
+export { UserRepository }                    from './user.repository';
+export { TeacherRepository }                 from './teacher.repository';
+export { CircleRepository }                  from './circle.repository';
+export { StudentRepository }                 from './student.repository';
+export { HomeworkRepository }                from './homework.repository';
+export { StudentMushafProgressRepository }   from './student-mushaf-progress.repository';
+export { QuranRepository }                   from './quran.repository';

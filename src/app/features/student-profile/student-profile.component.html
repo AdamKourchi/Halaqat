@@ -1,0 +1,137 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>الملف الشخصي للطالب</ion-title>
+    <ion-button slot="end" fill="clear" (click)="back()">
+      <ion-icon name="arrow-back"></ion-icon>
+    </ion-button>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  @if (student) {
+    <!-- Student Data Form -->
+    <ion-card>
+      <ion-card-header>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <ion-card-title>بيانات الطالب</ion-card-title>
+          <ion-button fill="clear" color="danger" (click)="confirmDeleteStudent()">
+            <ion-icon name="trash" slot="start"></ion-icon>
+            حذف
+          </ion-button>
+        </div>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item>
+          <ion-label position="stacked">الاسم</ion-label>
+          <ion-input [(ngModel)]="student.name"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">الجنس</ion-label>
+          <ion-select [(ngModel)]="student.gender" interface="popover">
+            <ion-select-option value="Male">ذكر</ion-select-option>
+            <ion-select-option value="Female">أنثى</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">ولي الأمر</ion-label>
+          <ion-input [(ngModel)]="student.parent_name" placeholder="اسم ولي الأمر"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">رقم ولي الأمر</ion-label>
+          <ion-input [(ngModel)]="student.parent_contact" placeholder="رقم الهاتف"></ion-input>
+        </ion-item>
+        <div class="ion-margin-top ion-text-start" style="display: flex; justify-content: center;">
+          <ion-button (click)="saveStudent()" >
+            <ion-icon name="save" slot="start"></ion-icon>
+            حفظ البيانات
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Excel Export Section -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>تقرير إكسيل (Excel)</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div style="display: flex; align-items: center;justify-content: center; gap: 30px; ">
+            <ion-datetime-button datetime="datetime-start"></ion-datetime-button>
+            <ion-modal [keepContentsMounted]="true">
+              <ng-template>
+                <ion-datetime
+                  id="datetime-start"
+                  name="startDate"
+                  presentation="date"
+                  [(ngModel)]="startDate"
+                  [showDefaultButtons]="true"
+                  doneText="تم"
+                  cancelText="إلغاء">
+                </ion-datetime>
+              </ng-template>
+            </ion-modal>
+            <ion-datetime-button datetime="datetime-end"></ion-datetime-button>
+            <ion-modal [keepContentsMounted]="true">
+              <ng-template>
+                <ion-datetime
+                  id="datetime-end"
+                  name="endDate"
+                  presentation="date"
+                  [(ngModel)]="endDate"
+                  [showDefaultButtons]="true"
+                  doneText="تم"
+                  cancelText="إلغاء">
+                </ion-datetime>
+              </ng-template>
+            </ion-modal>
+        </div>
+        <div style="display: flex; align-items: center;justify-content: center; margin-top: 10px;">
+          <ion-button color="success" (click)="generateExcel()">
+            <ion-icon name="document-text" slot="start"></ion-icon>
+            توليد ملف الإكسيل
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Homeworks List Section -->
+    <h3 class="ion-padding-horizontal">سجل التسميع والواجبات</h3>
+    <ion-list>
+      @for (hw of homeworks; track $index) {
+        <ion-item-sliding>
+          <ion-item>
+            <ion-label>
+              <h2>من {{ hw.start_surah }} آية {{ hw.start_ayah }} إلى {{ hw.end_surah }} آية {{ hw.end_ayah }}</h2>
+              <p>تاريخ: {{ hw.date_assigned }}</p>
+            </ion-label>
+            <ion-badge slot="end" [color]="hw.grade_mark ? 'success' : 'warning'">
+              {{ hw.grade_mark ? hw.grade_mark : 'لم يُسمّع بعد' }}
+            </ion-badge>
+            <ion-badge slot="end" *ngIf="hw.mistakes_count !== undefined && hw.grade_mark" color="medium">
+               أخطاء: {{ hw.mistakes_count }}
+            </ion-badge>
+          </ion-item>
+          <ion-item-options side="end">
+            <!-- Edit could be adding a function (not fully implemented in prompt, but we add delete as requested) -->
+            <ion-item-option color="danger" (click)="deleteHomework(hw)">
+              <ion-icon name="trash" slot="icon-only"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+      } @empty {
+        <ion-item>
+          <ion-label>لا توجد واجبات لهذا الطالب</ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  } @else {
+    <div class="ion-text-center ion-padding">
+      <p>جاري تحميل البيانات...</p>
+    </div>
+  }
+
+
+</ion-content>
+  <ion-footer style="height: 50px;">
+   
+  </ion-footer>

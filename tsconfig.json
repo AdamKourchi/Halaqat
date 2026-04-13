@@ -4,6 +4,12 @@
   "compilerOptions": {
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",
+    "paths": {
+      "@core":   ["src/app/core/index.ts"],
+      "@core/*": ["src/app/core/*"],
+      "@shared":   ["src/app/shared/index.ts"],
+      "@shared/*": ["src/app/shared/*"]
+    },
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
     "strict": true,

@@ -1,0 +1,55 @@
+@if (selectionMode) {
+  <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px;">
+    <div>
+      <ion-button fill="clear" color="danger" (click)="deleteSelected()">
+        <ion-icon name="trash" slot="icon-only"></ion-icon>
+      </ion-button>
+      <ion-button fill="clear" (click)="shareSelected()">
+        <ion-icon name="share-social" slot="icon-only"></ion-icon>
+      </ion-button>
+      <ion-button fill="clear" color="secondary" (click)="extractSummary()">
+        <ion-icon name="document-text" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+    <ion-button fill="clear" color="medium" (click)="cancelSelection()">
+      <ion-icon name="close" slot="icon-only"></ion-icon>
+    </ion-button>
+  </div>
+} @else {
+  <div style="display: flex; justify-content: space-between; align-items: center">
+    <p>السلام عليكم،  <span> {{this.user?.username}} </span></p>
+   
+    <ion-button fill="solid" (click)="importCircle()">
+      <ion-icon name="add"></ion-icon>
+      استيراد حلقة</ion-button>
+  </div>
+}
+@for (circle of circles; track $index) {
+  <ion-card button="true"
+            (touchstart)="startPress(circle)"
+            (touchend)="endPress()"
+            (touchmove)="endPress()"
+            (mousedown)="startPress(circle)"
+            (mouseup)="endPress()"
+            (mouseleave)="endPress()"
+            (click)="onCardClick(circle)"
+            [class.selected-card]="selectedCircles.has(circle.id!)">
+    <ion-card-header>
+      <ion-card-title>{{ circle.name }}</ion-card-title>
+      <ion-card-subtitle>{{ circle.type }}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <p>{{ circle.teacher_id }}</p>
+    </ion-card-content>
+  </ion-card>
+}@empty {
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>لا توجد حلقات</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>قم باستيراد حلقة لتظهر لك هنا</p>
+    </ion-card-content>
+  </ion-card>
+}
+

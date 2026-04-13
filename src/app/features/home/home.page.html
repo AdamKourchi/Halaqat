@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>حَلَقات</ion-title>
+
+    <ion-segment [value]="segmentValue" (ionChange)="segmentChanged($event)">
+      <ion-segment-button value="mine">
+        <ion-label>الخاصة</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="shared">
+        <ion-label>المشاركة</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding"  fixed-slot-placement="before" >
+
+  @if (segmentValue === 'mine') {
+    <app-my-circles></app-my-circles>
+  } @else if (segmentValue === 'shared') {
+    <app-shared-circles></app-shared-circles>
+  }
+</ion-content>

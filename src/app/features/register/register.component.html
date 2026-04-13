@@ -1,0 +1,20 @@
+<ion-header >
+  <ion-toolbar color="primary">
+    <ion-title>مستعمل جديد</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <h2>سجل معلوماتك</h2>
+  
+  <ion-list>
+    <ion-item>
+      <ion-label position="stacked">الاسم الكامل</ion-label>
+      <ion-input [(ngModel)]="name" placeholder="أدخل اسمك الكامل"></ion-input>
+    </ion-item>
+  </ion-list>
+  
+  <ion-button expand="block"  (click)="register()" [disabled]="!canRegister()">
+    سجل
+  </ion-button>
+</ion-content>

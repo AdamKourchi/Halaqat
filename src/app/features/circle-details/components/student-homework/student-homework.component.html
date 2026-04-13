@@ -1,0 +1,186 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>واجب {{ student?.name }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Section: Review / Grade Current Homework -->
+  @if (ungradedHomework) {
+    <ion-card class="ungraded-card" color="light" dir="rtl">
+      <ion-card-header>
+        <ion-card-title color="warning">
+          <ion-icon name="alert-circle" class="ion-margin-end"></ion-icon>
+          في انتظار التقييم
+        </ion-card-title>
+        <p class="summary-text" style="margin-top: 8px">
+          <strong>من:</strong> سورة
+          {{ getSurahName(ungradedHomework.start_surah) }} (آية
+          {{ ungradedHomework.start_ayah }}) <br />
+          <strong>إلى:</strong> سورة
+          {{ getSurahName(ungradedHomework.end_surah) }} (آية
+          {{ ungradedHomework.end_ayah }})
+        </p>
+      </ion-card-header>
+
+      <ion-card-content>
+        <!-- Quran Passage Display -->
+        <div class="quran-passage">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <h3 class="ion-text-center">النص القرآني</h3>
+            <ion-button
+              fill="clear"
+              size="small"
+              (click)="showQuranPassage = !showQuranPassage"
+            >
+              <ion-icon
+                slot="icon-only"
+                [name]="showQuranPassage ? 'eye-off' : 'eye'"
+              ></ion-icon>
+            </ion-button>
+          </div>
+          @if (showQuranPassage) {
+            <p class="quran-text">
+              @for (ayah of quranPassage; track $index) {
+                {{ ayah.text_warsh }}
+                <span class="ayah-number">﴿{{ ayah.ayah_number }}﴾</span>
+              }
+            </p>
+          }
+        </div>
+
+        <!-- Grading Form -->
+        <ion-list lines="full" class="ion-margin-top">
+          <ion-list-header>
+            <ion-label>تقييم الواجب</ion-label>
+          </ion-list-header>
+
+          <ion-item>
+            <ion-select
+            cancelText="إلغاء"
+            okText="حسنا"
+              label="التقييم"
+              [(ngModel)]="gradeMark"
+              placeholder="اختر التقييم"
+            >
+              @for (grade of grades; track $index) {
+                <ion-select-option [value]="grade.key">{{ grade.value }}</ion-select-option>
+              }
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-input
+              label="عدد الأخطاء"
+              type="number"
+              [(ngModel)]="mistakesCount"
+              placeholder="0"
+            ></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-textarea
+              label="ملاحظات"
+              [(ngModel)]="remark"
+              placeholder="أية تعليقات إضافية..."
+              autoGrow="true"
+            ></ion-textarea>
+          </ion-item>
+        </ion-list>
+
+        <ion-button
+          expand="block"
+          class="ion-margin-top"
+          (click)="submitGrade()"
+          color="success"
+        >
+          حفظ التقييم
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  } @else {
+    <ion-card class="assign-card" dir="rtl">
+      <ion-card-header>
+        <ion-card-title color="primary">
+          <ion-icon name="checkmark-circle" class="ion-margin-end"></ion-icon>
+          لا يوجد واجبات معلقة
+        </ion-card-title>
+        <p>قم بتعيين الواجب الجديد بالأسفل.</p>
+      </ion-card-header>
+
+      <ion-card-content>
+        <ion-list lines="full">
+          <ion-list-header>
+            <ion-label>متن الواجب الجديد</ion-label>
+          </ion-list-header>
+
+          <!-- Start Coordinates -->
+          <ion-item>
+            <ion-select
+              label="سورة البداية"
+              [(ngModel)]="newStartSurah"
+              (ionChange)="onStartSurahChange()"
+              placeholder="اختر السورة"
+            >
+              <ion-select-option *ngFor="let s of surahs" [value]="s.id"
+                >{{ s.id }}. {{ s.name_arabic }}</ion-select-option
+              >
+            </ion-select>
+          </ion-item>
+          <ion-item >
+            <ion-input
+              label="آية البداية"
+              type="number"
+              [(ngModel)]="newStartAyah"
+              min="1"
+              [max]="getMaxAyahs(newStartSurah)"
+            ></ion-input>
+          </ion-item>
+
+
+
+          <!-- End Coordinates -->
+          <ion-item>
+            <ion-select
+              label="سورة النهاية"
+              [(ngModel)]="newEndSurah"
+              placeholder="اختر السورة"
+            >
+              <ion-select-option *ngFor="let s of surahs" [value]="s.id"
+                >{{ s.id }}. {{ s.name_arabic }}</ion-select-option
+              >
+            </ion-select>
+          </ion-item>
+          <ion-item *ngIf="newEndSurah">
+            <ion-input
+              label="آية النهاية"
+              type="number"
+              [(ngModel)]="newEndAyah"
+              min="1"
+              [max]="getMaxAyahs(newEndSurah)"
+            ></ion-input>
+          </ion-item>
+        </ion-list>
+
+        <ion-button
+          expand="block"
+          class="ion-margin-top"
+          (click)="assignNewHomework()"
+        >
+          تعيين الواجب
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  }
+</ion-content>
