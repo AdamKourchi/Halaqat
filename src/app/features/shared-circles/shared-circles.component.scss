@@ -1,0 +1,42 @@
+.circle-card-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.circle-avatar {
+  font-size: 1.3rem;
+  // Uses gradient from a different angle for visual differentiation
+  background: linear-gradient(135deg, var(--ion-color-secondary), var(--ion-color-primary));
+}
+
+.circle-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.circle-name {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ion-text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.type-chip {
+  background: rgba(var(--ion-color-tertiary-rgb), 0.1);
+  color: var(--ion-color-tertiary);
+}
+
+.chevron-icon {
+  color: var(--ion-color-medium);
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.selected-check {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}

@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>إنشاء حلقة جديد</ion-title>
+    <ion-title>{{ isEdit ? 'تعديل حلقة' : 'إنشاء حلقة جديد' }}</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="cancel()">إلغاء</ion-button>
     </ion-buttons>
@@ -24,7 +24,7 @@
 
 <ion-toolbar>
   <ion-button expand="block" (click)="confirm()" [disabled]="!circleName">
-    إنشاء
+    {{ isEdit ? 'تعديل' : 'إنشاء' }}
   </ion-button>
 </ion-toolbar>
 

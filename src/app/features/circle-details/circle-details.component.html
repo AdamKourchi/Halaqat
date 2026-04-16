@@ -1,67 +1,89 @@
-<ion-header>
+<ion-header class="ion-no-border">
   <ion-toolbar>
-    <ion-title>حَلَقات</ion-title>
-    <ion-button slot="end" fill="clear" (click)="back()">
-      <ion-icon name="arrow-back"></ion-icon>
+    <ion-button slot="start" fill="clear" (click)="back()">
+      <ion-icon name="arrow-back" slot="icon-only"></ion-icon>
     </ion-button>
+    <ion-title>
+      <span class="page-title">حَلَقات</span>
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding" fixed-slot-placement="before">
+<ion-content fixed-slot-placement="before">
+
+  <!-- ── Selection Toolbar ──────────────────── -->
   @if (selectionMode) {
-    <div
-      style="
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-bottom: 10px;
-      "
-    >
-      <div>
-        <ion-button fill="clear" color="danger" (click)="deleteSelected()">
-          <ion-icon name="trash" slot="icon-only"></ion-icon>
-        </ion-button>
-        <ion-button fill="clear" (click)="shareSelected()">
+    <div class="selection-bar">
+      <div class="rtl-row" style="gap: 4px;">
+        @if (!isSharedCircle) {
+          <ion-button fill="clear" color="danger" (click)="deleteSelected()">
+            <ion-icon name="trash" slot="icon-only"></ion-icon>
+          </ion-button>
+        }
+        <ion-button fill="clear" color="primary" (click)="shareSelected()">
           <ion-icon name="share-social" slot="icon-only"></ion-icon>
         </ion-button>
         <ion-button fill="clear" color="secondary" (click)="extractSummary()">
           <ion-icon name="document-text" slot="icon-only"></ion-icon>
         </ion-button>
+        @if (!isSharedCircle && selectedStudents.size === 1) {
+          <ion-button fill="clear" color="primary" (click)="editSelected()">
+            <ion-icon name="pencil" slot="icon-only"></ion-icon>
+          </ion-button>
+        }
       </div>
       <ion-button fill="clear" color="medium" (click)="cancelSelection()">
         <ion-icon name="close" slot="icon-only"></ion-icon>
       </ion-button>
     </div>
+
   } @else {
-    <div
-      style="display: flex; justify-content: space-between; align-items: center"
-    >
-      <div>
-        <p>
-         <span> {{ this.circle?.name }}. </span>
-          <small>{{ this.students.length }}</small>
-        </p>
-        <small>
-          المشرف: <span> {{ this.user?.username }} </span>
-        </small>
+    <!-- ── Circle Header ──────────────────────── -->
+    <div class="circle-header">
+      <div class="circle-header-info">
+        <div class="avatar-circle circle-detail-avatar">
+          {{ circle?.name?.charAt(0) }}
+        </div>
+        <div>
+          <h2 class="circle-detail-name">{{ circle?.name }}</h2>
+          <p class="circle-detail-supervisor">
+            <ion-icon name="person-circle-outline"></ion-icon>
+            {{ findTeacherName(circle?.teacher_id || null) }}
+          </p>
+        </div>
       </div>
-      <ion-button fill="solid" (click)="openCreateStudentModal()">
-        <ion-icon name="add"></ion-icon>
-        إضافة طالب</ion-button
-      >
+      <div class="circle-header-actions">
+        <span class="student-count-badge">
+          {{ students.length }} طالب
+        </span>
+        @if (!isSharedCircle) {
+          <ion-button fill="solid" size="small" (click)="openCreateStudentModal()">
+            <ion-icon name="add" slot="start"></ion-icon>
+            إضافة
+          </ion-button>
+        }
+      </div>
     </div>
   }
-  
-  <ion-segment [value]="filterType" (ionChange)="setFilter($event.detail.value)" scrollable="true" class="ion-margin-bottom ion-margin-top">
+
+  <!-- ── Filter Segment ────────────────────── -->
+  <ion-segment
+    [value]="filterType"
+    (ionChange)="setFilter($event.detail.value)"
+    scrollable="true"
+    mode="md"
+    class="filter-segment"
+  >
     <ion-segment-button value="all">الكل</ion-segment-button>
     <ion-segment-button value="Male">ذكور</ion-segment-button>
     <ion-segment-button value="Female">إناث</ion-segment-button>
     <ion-segment-button value="graded_today">مُنجَز</ion-segment-button>
-    <ion-segment-button value="not_graded">لَمْ يُسَمِّع بَعْد</ion-segment-button>
+    <ion-segment-button value="not_graded">لَمْ يُسَمِّع</ion-segment-button>
     <ion-segment-button value="no_homework">بدون واجب</ion-segment-button>
   </ion-segment>
 
-  @for (student of filteredStudents; track $index) {
+  <!-- ── Student Cards ──────────────────────── -->
+  @for (student of filteredStudents; track student.id) {
     <ion-card
       button="true"
       (touchstart)="startPress(student)"
@@ -73,41 +95,51 @@
       (click)="onCardClick(student)"
       [class.selected-card]="selectedStudents.has(student.id!)"
     >
-      <ion-card-header>
-        <div style="display: flex; justify-content: space-between; align-items: start;">
-          <div>
-            <ion-card-title>{{ student.name }}</ion-card-title>
-            <ion-card-subtitle>{{ student.gender === "Male" ? "ذكر" : "أنثى" }}</ion-card-subtitle>
+      <ion-card-content>
+        <div class="student-card-inner">
+          <!-- Avatar -->
+          <div class="avatar-circle student-avatar"
+               [class.avatar-male]="student.gender === 'Male'"
+               [class.avatar-female]="student.gender === 'Female'">
+            {{ student.name.charAt(0) }}
           </div>
-          <div>
-            @if (student.has_ungraded_homework) {
-              <ion-badge color="warning">لَمْ يُسَمِّع بَعْد</ion-badge>
-            } @else if (student.is_graded_today) {
-              <ion-badge color="success">مُنجَز</ion-badge>
-            }@else {
-              <ion-badge color="secondary">بدون واجب</ion-badge>
+
+          <!-- Info -->
+          <div class="student-info">
+            <div class="student-name-row">
+              <span class="student-name">{{ student.name }}</span>
+              @if (student.is_graded_today) {
+                <ion-badge color="success">سَمّع اليوم</ion-badge>
+              } @else if (student.has_ungraded_homework) {
+                <ion-badge color="warning">لَمْ يُسَمِّع</ion-badge>
+              } @else {
+                <ion-badge color="medium">بدون واجب</ion-badge>
+              }
+            </div>
+
+            @if (student.parent_name) {
+              <p class="student-parent">
+                <ion-icon name="call-outline"></ion-icon>
+                {{ student.parent_name }}
+              </p>
             }
           </div>
+
+          <!-- Trailing -->
+          @if (selectedStudents.has(student.id!)) {
+            <ion-icon name="checkmark-circle" class="selected-check" color="primary"></ion-icon>
+          } @else {
+            <ion-icon name="chevron-back" class="chevron-icon"></ion-icon>
+          }
         </div>
-      </ion-card-header>
-      <ion-card-content>
-        @if (student.parent_name) {
-          <p>
-            ولي الأمر: {{ student.parent_name }} - {{ student.parent_contact }}
-          </p>
-        } @else {
-          <p>لا توجد بيانات لولي الأمر</p>
-        }
       </ion-card-content>
     </ion-card>
   } @empty {
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>لا يوجد طلاب بهذه المواصفات</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <p>لا تتطابق نتائج مع التصفية الحالية</p>
-      </ion-card-content>
-    </ion-card>
+    <div class="empty-state">
+      <ion-icon name="people-outline"></ion-icon>
+      <p>لا يوجد طلاب بهذه المواصفات</p>
+      <p style="font-size: 0.82rem;">جرّب تغيير التصفية أو إضافة طالب</p>
+    </div>
   }
+
 </ion-content>

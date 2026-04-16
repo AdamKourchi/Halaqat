@@ -3,6 +3,8 @@ import { BaseRepository } from './base.repository';
 import { Circle } from '../models/circle.model';
 import { HomeworkRepository } from './homework.repository';
 import { StudentRepository } from './student.repository';
+import { UuidHelper } from '../helpers';
+import { TeacherRepository } from './teacher.repository';
 
 /**
  * CircleRepository
@@ -11,30 +13,43 @@ import { StudentRepository } from './student.repository';
  */
 @Injectable({ providedIn: 'root' })
 export class CircleRepository extends BaseRepository {
-
   private studentRepo = inject(StudentRepository);
   private homeworkRepo = inject(HomeworkRepository);
+  private uuidHelper = inject(UuidHelper);
+  private teacherRepo = inject(TeacherRepository);
 
   async findAll(): Promise<Circle[]> {
     return this.query<Circle>('SELECT * FROM circles ORDER BY name ASC');
   }
 
-  async findById(id: number): Promise<Circle | null> {
-    const rows = await this.query<Circle>('SELECT * FROM circles WHERE id = ?', [id]);
+  async findOwnerCircles(): Promise<Circle[]> {
+    const owner = await this.teacherRepo.findOwner();
+    if (!owner || !owner.id) {
+      return [];
+    }
+    return this.findByTeacherId(owner.id);
+  }
+
+  async findById(id: string): Promise<Circle | null> {
+    const rows = await this.query<Circle>(
+      'SELECT * FROM circles WHERE id = ?',
+      [id]
+    );
     return rows[0] ?? null;
   }
 
   /** Return all circles for a specific teacher. */
-  async findByTeacherId(teacherId: number): Promise<Circle[]> {
+  async findByTeacherId(teacherId: string): Promise<Circle[]> {
     return this.query<Circle>(
-      'SELECT * FROM circles WHERE teacher_id = ? ORDER BY name ASC', [teacherId]
+      'SELECT * FROM circles WHERE teacher_id = ? ORDER BY name ASC',
+      [teacherId]
     );
   }
 
-  async findAllSharedCircles(){
+  async findAllSharedCircles() {
     //all circles that have Teacher in the teacher table
     return this.query<Circle>(
-      'SELECT * FROM circles WHERE teacher_id NOT IN (SELECT id FROM users)'
+      'SELECT * FROM circles WHERE teacher_id NOT IN (SELECT id FROM teachers WHERE is_owner = 1)'
     );
   }
 
@@ -42,41 +57,95 @@ export class CircleRepository extends BaseRepository {
    * Create a circle. Returns the new id.
    */
   async create(
-    teacherId: number,
+    userId: string,
     name: string,
     type: string,
     creationDate?: string
   ): Promise<number> {
+    const id = this.uuidHelper.generate();
+
     return this.run(
-      `INSERT INTO circles (teacher_id, name, type, creation_date)
-       VALUES (?, ?, ?, ?)`,
-      [teacherId, name, type, creationDate ?? new Date().toISOString().split('T')[0]]
+      `INSERT INTO circles (id,teacher_id, name, type, creation_date)
+       VALUES (?, ?, ?, ?, ?)`,
+      [
+        id,
+        userId,
+        name,
+        type,
+        creationDate ?? new Date().toISOString().split('T')[0],
+      ]
     );
   }
 
-  async update(id: number, data: Partial<Circle>): Promise<void> {
+  async update(id: string, data: Partial<Circle>): Promise<void> {
     const { clause, values } = this.buildSetClause(data);
-    await this.run(`UPDATE circles SET ${clause} WHERE id = ?`, [...values, id]);
+    await this.run(`UPDATE circles SET ${clause} WHERE id = ?`, [
+      ...values,
+      id,
+    ]);
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: string): Promise<void> {
+    //Delete  the teacher if he doesnt have other circle
+    const circle = await this.findById(id);
+    const teacher = await this.teacherRepo.findById(circle?.teacher_id || '');
+    if (circle) {
+      const teacherCircles = await this.findByTeacherId(circle.teacher_id);
+      if (teacherCircles.length === 1 && teacher && !teacher.is_owner) {
+        await this.teacherRepo.delete(teacher.id);
+      }
+    }
+    //Delete the students and their homeworks :
+    const students = await this.studentRepo.findByCircleId(id);
+    const homeworks = await this.homeworkRepo.findByCircleId(id);
+    for (const student of students) {
+      if (student.id) await this.studentRepo.delete(student.id);
+    }
+    for (const homework of homeworks) {
+      if (homework.id) await this.homeworkRepo.delete(homework.id);
+    }
     await this.run('DELETE FROM circles WHERE id = ?', [id]);
   }
 
   async count(): Promise<number> {
-    const rows = await this.query<{ total: number }>('SELECT COUNT(*) AS total FROM circles');
+    const rows = await this.query<{ total: number }>(
+      'SELECT COUNT(*) AS total FROM circles'
+    );
     return rows[0]?.total ?? 0;
   }
 
-  async extractToJSON(id : number){
+  async extractToJSON(id: string) {
     const circle = await this.findById(id);
+    const teacher = await this.teacherRepo.findById(circle?.teacher_id || '');
     const students = await this.studentRepo.findByCircleId(id);
     const homeworks = await this.homeworkRepo.findByCircleId(id);
     const data = {
       circle,
+      teacher,
       students,
-      homeworks
+      homeworks,
     };
+
     return JSON.stringify(data);
+  }
+
+  async upsert(circle: Circle): Promise<void> {
+    if (!circle.id) return;
+    const exists = await this.findById(circle.id);
+    if (exists) {
+      await this.update(circle.id, circle);
+    } else {
+      await this.run(
+        `INSERT INTO circles (id, teacher_id, name, type, creation_date)
+         VALUES (?, ?, ?, ?, ?)`,
+        [
+          circle.id,
+          circle.teacher_id,
+          circle.name,
+          circle.type,
+          circle.creation_date,
+        ]
+      );
+    }
   }
 }

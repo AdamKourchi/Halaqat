@@ -1,5 +1,5 @@
 {
-  "name": "Hifd",
+  "name": "Halaqat",
   "version": "0.0.1",
   "author": "Ionic Framework",
   "homepage": "https://ionicframework.com/",
@@ -31,6 +31,7 @@
     "@capacitor/share": "^8.0.1",
     "@capacitor/status-bar": "8.0.1",
     "@ionic/angular": "^8.0.0",
+    "@mindlib-capacitor/send-intent": "^8.0.6",
     "date-fns": "^4.1.0",
     "exceljs": "^4.4.0",
     "ionicons": "^7.0.0",
@@ -50,6 +51,7 @@
     "@angular/cli": "^20.0.0",
     "@angular/compiler-cli": "^20.0.0",
     "@angular/language-service": "^20.0.0",
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^8.2.0",
     "@ionic/angular-toolkit": "^12.0.0",
     "@types/jasmine": "~5.1.0",

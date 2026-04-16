@@ -3,9 +3,9 @@ export type GradeMark = 'Excellent' | 'Very Good' | 'Good' | 'Needs Work' |'Abse
 
 /** Homework model – matches the `homeworks` table schema. */
 export interface Homework {
-  id?: number;
-  student_id: number;
-  circle_id?: number | null;
+  id?: string;
+  student_id: string;
+  circle_id?: string | null;
   date_assigned?: string;
   start_surah: number;
   start_ayah: number;

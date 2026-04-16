@@ -1,7 +1,7 @@
 /** Student model – matches the `students` table schema. */
 export interface Student {
-  id?: number;
-  circle_id: number;
+  id?: string;
+  circle_id: string;
   name: string;
   gender: 'Male' | 'Female' | string;
   enlistment_date?: string;

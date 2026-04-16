@@ -10,27 +10,24 @@ import {
   IonIcon,
   IonButtons,
   ModalController,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
   IonItem,
-  IonLabel,
   IonSelect,
   IonSelectOption,
   IonInput,
   IonTextarea,
   IonList,
-  IonListHeader,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   close,
   checkmarkCircle,
+  checkmarkCircleOutline,
   alertCircle,
-  eye,
-  eyeOff,
-  addCircleOutline,
+  eyeOutline,
+  eyeOffOutline,
+  arrowDownOutline,
+  bookmarkOutline,
+  bookOutline,
 } from 'ionicons/icons';
 import {
   Student,
@@ -54,18 +51,12 @@ import {
     IonButton,
     IonIcon,
     IonButtons,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
     IonItem,
-    IonLabel,
     IonSelect,
     IonSelectOption,
     IonInput,
     IonTextarea,
     IonList,
-    IonListHeader,
   ],
   selector: 'app-student-homework',
   templateUrl: './student-homework.component.html',
@@ -73,7 +64,8 @@ import {
 })
 export class StudentHomeworkComponent implements OnInit {
   @Input() student!: Student;
-  @Input() circleId!: number;
+  @Input() circleId!: string;
+  @Input() isSharedCircle: boolean = false;
 
   private modalCtrl = inject(ModalController);
   private homeworkRepo = inject(HomeworkRepository);
@@ -94,16 +86,47 @@ export class StudentHomeworkComponent implements OnInit {
   newStartAyah: number | null = null;
   newEndSurah: number | null = null;
   newEndAyah: number | null = null;
-  showQuranPassage: boolean = true;
+  
+  // Quran Passage Display State
+  showQuranPassage: boolean = false;
+  currentPage: number = 1;
+  itemsPerPage: number = 10;
+
+  get totalPages(): number {
+    return Math.ceil(this.quranPassage.length / this.itemsPerPage);
+  }
+
+  get paginatedPassage(): Ayah[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    return this.quranPassage.slice(startIndex, startIndex + this.itemsPerPage);
+  }
+
+  toggleQuranPassage() {
+    this.showQuranPassage = !this.showQuranPassage;
+    if (this.showQuranPassage) {
+      this.currentPage = 1;
+    }
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) this.currentPage++;
+  }
+
+  prevPage() {
+    if (this.currentPage > 1) this.currentPage--;
+  }
 
   async ngOnInit() {
     addIcons({
       close,
       'checkmark-circle': checkmarkCircle,
+      'checkmark-circle-outline': checkmarkCircleOutline,
       'alert-circle': alertCircle,
-      eye,
-      'eye-off': eyeOff,
-      'add-circle-outline': addCircleOutline,
+      'eye-outline': eyeOutline,
+      'eye-off-outline': eyeOffOutline,
+      'arrow-down-outline': arrowDownOutline,
+      'bookmark-outline': bookmarkOutline,
+      'book-outline': bookOutline,
     });
     this.surahs = await this.quranRepo.getAllSurahs();
     await this.loadUngradedHomework();

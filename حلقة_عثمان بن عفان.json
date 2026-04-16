@@ -1,0 +1,58 @@
+{
+  "circle": {
+    "id": "54f5fc09-19c7-442d-98bf-4aacce496320",
+    "teacher_id": "7932380c-5214-4911-a83b-c665707e0956",
+    "name": "عتمان",
+    "type": "حلقة تحفيظ",
+    "creation_date": "2026-04-16"
+  },
+  "teacher": {
+    "id": "7932380c-5214-4911-a83b-c665707e0956",
+    "name": "adam",
+    "is_owner": 1,
+    "contact_info": "123456"
+  },
+  "students": [
+    {
+      "id": "fdb44bd3-290d-4b6a-84ad-f9356a98dd3c",
+      "circle_id": "54f5fc09-19c7-442d-98bf-4aacce496320",
+      "name": "محمد",
+      "gender": "Male",
+      "enlistment_date": "2026-04-16",
+      "parent_name": "اا",
+      "parent_contact": "05",
+      "is_graded_today": 1,
+      "has_ungraded_homework": 1
+    }
+  ],
+  "homeworks": [
+    {
+      "id": "32a20cb4-90b2-439b-8370-f37d9a7475ea",
+      "student_id": "fdb44bd3-290d-4b6a-84ad-f9356a98dd3c",
+      "circle_id": "54f5fc09-19c7-442d-98bf-4aacce496320",
+      "date_assigned": "2026-04-16",
+      "start_surah": 1,
+      "start_ayah": 1,
+      "end_surah": 1,
+      "end_ayah": 7,
+      "mistakes_count": 0,
+      "grade_mark": "Excellent",
+      "remark": "",
+      "graded_date": "2026-04-16"
+    },
+    {
+      "id": "2782cb2e-6108-4e5e-8a17-e0f1a7767585",
+      "student_id": "fdb44bd3-290d-4b6a-84ad-f9356a98dd3c",
+      "circle_id": "54f5fc09-19c7-442d-98bf-4aacce496320",
+      "date_assigned": "2026-04-16",
+      "start_surah": 2,
+      "start_ayah": 1,
+      "end_surah": 2,
+      "end_ayah": 7,
+      "mistakes_count": 0,
+      "grade_mark": null,
+      "remark": null,
+      "graded_date": null
+    }
+  ]
+}

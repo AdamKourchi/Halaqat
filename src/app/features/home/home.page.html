@@ -1,8 +1,17 @@
-<ion-header>
+<ion-header class="ion-no-border">
   <ion-toolbar>
-    <ion-title>حَلَقات</ion-title>
+    <ion-title>
+      <span class="app-brand">حَلَقات</span>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="openGlobalExtractModal()" fill="clear">
+        <ion-icon slot="icon-only" name="document-text-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
 
-    <ion-segment [value]="segmentValue" (ionChange)="segmentChanged($event)">
+  <ion-toolbar>
+    <ion-segment [value]="segmentValue" (ionChange)="segmentChanged($event)" mode="md">
       <ion-segment-button value="mine">
         <ion-label>الخاصة</ion-label>
       </ion-segment-button>
@@ -13,8 +22,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding"  fixed-slot-placement="before" >
-
+<ion-content fixed-slot-placement="before">
   @if (segmentValue === 'mine') {
     <app-my-circles></app-my-circles>
   } @else if (segmentValue === 'shared') {

@@ -1,4 +1,40 @@
-.selected-card {
-  --background: rgba(var(--ion-color-primary-rgb), 0.1);
-  border: 2px solid var(--ion-color-primary);
+.circle-card-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.circle-avatar {
+  font-size: 1.3rem;
+}
+
+.circle-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.circle-name {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ion-text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.type-chip {
+  background: rgba(var(--ion-color-tertiary-rgb), 0.1);
+  color: var(--ion-color-tertiary);
+}
+
+.chevron-icon {
+  color: var(--ion-color-medium);
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.selected-check {
+  font-size: 1.4rem;
+  flex-shrink: 0;
 }

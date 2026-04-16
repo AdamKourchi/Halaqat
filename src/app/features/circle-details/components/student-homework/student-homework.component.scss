@@ -1,34 +1,172 @@
+// ── Accent-border card ───────────────────────
+.hw-card {
+  position: relative;
+  border-radius: var(--halaqat-border-radius, 14px);
+  overflow: hidden;
+  background: var(--ion-card-background, #fff);
+  box-shadow: var(--halaqat-card-shadow, 0 2px 12px rgba(0,0,0,0.07));
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: row;
+}
+
+.hw-card-accent {
+  width: 5px;
+  flex-shrink: 0;
+  border-radius: 0;
+}
+
+.pending-accent { background: var(--ion-color-warning); }
+.assign-accent  { background: var(--ion-color-primary); }
+
+.hw-card-body {
+  flex: 1;
+  padding: 16px 14px;
+  min-width: 0;
+}
+
+// ── Card Title row ───────────────────────────
+.hw-card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+
+  ion-icon { font-size: 1.3rem; }
+}
+
+.hw-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ion-text-color);
+}
+
+.warning-text { color: var(--ion-color-warning-shade); }
+
+.hw-card-sub {
+  margin: -6px 0 12px;
+  font-size: 0.82rem;
+  color: var(--ion-color-medium);
+}
+
+// ── Range summary ────────────────────────────
+.range-summary {
+  background: rgba(var(--ion-color-primary-rgb), 0.05);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+
+.range-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.range-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ion-color-primary);
+  min-width: 22px;
+}
+
+.range-value {
+  font-size: 0.88rem;
+  color: var(--ion-text-color);
+}
+
+.range-divider {
+  display: flex;
+  justify-content: center;
+  margin: 6px 0;
+  color: var(--ion-color-medium);
+  font-size: 0.85rem;
+}
+
+// ── Quran passage ────────────────────────────
 .quran-passage {
-  background: white;
-  padding: 16px;
-  border-radius: 8px;
-  border: 1px solid var(--ion-color-step-150, #ddd);
-  margin-top: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--halaqat-divider, #e2e8f0);
+  overflow: hidden;
+  margin-bottom: 14px;
+}
 
-  h3 {
-    margin-top: 0;
-    color: var(--ion-color-medium);
-    font-size: 0.9em;
-  }
+.quran-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(var(--ion-color-light-rgb), 0.6);
+  border-bottom: 1px solid var(--halaqat-divider, #e2e8f0);
+}
 
-  .quran-text {
-    font-family: "Amiri", "Scheherazade New", serif; /* standard quran fonts */
-    font-size: 1rem;
-    line-height: 2;
-    text-align: justify;
-    color: black;
-  }
+.quran-text-container {
+  padding: 12px;
+  animation: fadeIn 0.3s ease-out;
+}
 
-  .ayah-number {
-    font-size: 0.7em;
-    color: var(--ion-color-primary);
-    margin: 0 4px;
-    display: inline-block;
+.quran-text {
+  font-family: "Amiri", "Scheherazade New", serif;
+  font-size: 1.05rem;
+  line-height: 2.2;
+  text-align: justify;
+  color: var(--ion-text-color);
+  margin: 0;
+  direction: rtl;
+}
+
+.ayah-number {
+  font-size: 0.65em;
+  color: var(--ion-color-primary);
+  margin: 0 3px;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--halaqat-divider, #e2e8f0);
+}
+
+.page-indicator {
+  font-size: 0.8rem;
+  color: var(--ion-color-medium);
+}
+
+// ── Section label ────────────────────────────
+.section-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ion-color-medium);
+  margin: 0 0 8px;
+}
+
+// ── Grading form ─────────────────────────────
+.grade-section { margin-top: 4px; }
+
+.grade-list {
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--ion-item-background, #fff);
+  border: 1px solid var(--halaqat-divider, #e2e8f0);
+}
+
+.grade-item {
+  --inner-padding-end: 0;
+  --padding-start: 14px;
+  font-size: 0.9rem;
+
+  & + .grade-item {
+    border-top: 1px solid var(--halaqat-divider, #e2e8f0);
   }
 }
 
-.ungraded-card,
-.assign-card {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border-radius: 12px;
+// ── Animations ───────────────────────────────
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }

@@ -1,7 +1,7 @@
 /** Teacher model – matches the `teachers` table schema. */
 export interface Teacher {
-  id?: number;
-  user_id?: number | null;
+  id: string;
   name: string;
-  contact_info?: string | null;
+  contact_info: string | null;
+  is_owner: boolean ;
 }

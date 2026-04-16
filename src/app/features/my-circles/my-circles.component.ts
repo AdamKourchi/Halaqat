@@ -2,18 +2,22 @@ import { Component, inject, OnInit } from '@angular/core';
 import {
   IonIcon,
   IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardSubtitle,
   IonCardContent,
   IonButton,
   ModalController,
-  AlertController
+  AlertController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add, trash, shareSocial, documentText, close } from 'ionicons/icons';
-import { CircleRepository, UserRepository, StudentRepository, HomeworkRepository, ExcelService } from '@core';
-import { Circle, User } from '@core';
+import { add, trash, shareSocial, documentText, close, pencil, people, albumsOutline, chevronBack, checkmarkCircle } from 'ionicons/icons';
+import {
+  CircleRepository,
+  StudentRepository,
+  TeacherRepository,
+  HomeworkRepository,
+  ExcelService,
+  JsonService,
+} from '@core';
+import { Circle, Teacher } from '@core';
 import { CreateCircleComponent } from './components/create-circle/create-circle.component';
 import { Router } from '@angular/router';
 
@@ -25,9 +29,6 @@ import { Router } from '@angular/router';
   imports: [
     IonButton,
     IonCardContent,
-    IonCardSubtitle,
-    IonCardTitle,
-    IonCardHeader,
     IonCard,
     IonIcon,
   ],
@@ -35,35 +36,44 @@ import { Router } from '@angular/router';
 export class MyCirclesComponent implements OnInit {
   private circleRepo = inject(CircleRepository);
   private modalCtrl = inject(ModalController);
-  private userRepo = inject(UserRepository);
   private studentRepo = inject(StudentRepository);
   private homeworkRepo = inject(HomeworkRepository);
   private excelService = inject(ExcelService);
   private alertCtrl = inject(AlertController);
   private router = inject(Router);
-  
+  private jsonService = inject(JsonService);
+  private teacherRepo = inject(TeacherRepository);
+
   circles: Circle[] = [];
-  user: User|null = null;
+  owner: Teacher | null = null;
+  studentCountMap: Record<string, number> = {};
 
   selectionMode = false;
-  selectedCircles: Set<number> = new Set();
+  selectedCircles: Set<string> = new Set();
   private pressTimer: any;
   private longPressActive = false;
 
   async fetchCircles() {
     try {
-      this.circles = await this.circleRepo.findAll();
+      this.circles = await this.circleRepo.findOwnerCircles();
+      // Fetch student counts in parallel
+      const counts = await Promise.all(
+        this.circles.map(c => c.id
+          ? this.studentRepo.findByCircleId(c.id).then(s => ({ id: c.id!, count: s.length }))
+          : Promise.resolve({ id: '', count: 0 })
+        )
+      );
+      this.studentCountMap = counts.reduce((acc, r) => { acc[r.id] = r.count; return acc; }, {} as Record<string, number>);
     } catch (error) {
       console.log(error);
     }
   }
 
-  async fetchUserData(){
+  async fetchOwnerData() {
     try {
-      const users = await this.userRepo.findByRole('USER');
-      this.user = users[0];
+      const owner = await this.teacherRepo.findOwner();
+      this.owner = owner;
     } catch (error) {
-
       console.log(error);
     }
   }
@@ -72,19 +82,19 @@ export class MyCirclesComponent implements OnInit {
     const modal = await this.modalCtrl.create({
       component: CreateCircleComponent,
     });
-    
+
     await modal.present();
-    
+
     const { data, role } = await modal.onWillDismiss();
 
     if (role === 'confirm') {
       try {
-        if (this.user && this.user.id !== undefined) {
-          await this.circleRepo.create(this.user.id, data.name, data.type);
+        if (this.owner && this.owner.id !== undefined) {
+          await this.circleRepo.create(this.owner.id, data.name, data.type);
         }
       } catch (error) {
         console.log(error);
-      }finally{
+      } finally {
         this.fetchCircles();
       }
     }
@@ -141,29 +151,84 @@ export class MyCirclesComponent implements OnInit {
     this.selectedCircles.clear();
   }
 
-  deleteSelected() {
-    try {
-      for (const circleId of this.selectedCircles) {
-        this.circleRepo.delete(circleId);
-      }
-    } catch (error) {
-      console.log(error);
-    }finally{
-      this.fetchCircles();
-    }
-    this.cancelSelection();
+  async deleteSelected() {
+    const count = this.selectedCircles.size;
+    const label = count === 1 ? 'هذه الحلقة' : `${count} حلقات`;
+
+    const alert = await this.alertCtrl.create({
+      header: 'تأكيد الحذف',
+      message: `هل أنت متأكد أنك تريد حذف ${label}؟ لا يمكن التراجع عن هذا الإجراء.`,
+      buttons: [
+        { text: 'إلغاء', role: 'cancel' },
+        {
+          text: 'حذف',
+          role: 'destructive',
+          cssClass: 'alert-button-danger',
+          handler: async () => {
+            try {
+              for (const circleId of this.selectedCircles) {
+                await this.circleRepo.delete(circleId);
+              }
+            } catch (error) {
+              console.log(error);
+            } finally {
+              await this.fetchCircles();
+              this.cancelSelection();
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
   }
 
-  shareSelected() {
-   try {
-    for (const circleId of this.selectedCircles) {
-      this.circleRepo.extractToJSON(circleId);
+  async editSelected() {
+    if (this.selectedCircles.size !== 1) return;
+    
+    const circleId = Array.from(this.selectedCircles)[0];
+    const circle = this.circles.find(c => c.id === circleId);
+    
+    if (!circle) return;
+
+    const modal = await this.modalCtrl.create({
+      component: CreateCircleComponent,
+      componentProps: {
+        isEdit: true,
+        circleName: circle.name,
+        circleType: circle.type
+      }
+    });
+
+    await modal.present();
+
+    const { data, role } = await modal.onWillDismiss();
+
+    if (role === 'confirm') {
+      try {
+        await this.circleRepo.update(circleId, {
+          name: data.name,
+          type: data.type
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.fetchCircles();
+        this.cancelSelection();
+      }
     }
-   } catch (error) {
-    console.log(error);
-   }finally{
-    this.cancelSelection();
-   }
+  }
+
+  async shareSelected() {
+    if (this.selectedCircles.size === 0) return;
+    if (this.selectedCircles.size === 1) {
+      await this.jsonService.generateJson(
+        this.selectedCircles.values().next().value!,
+      );
+    } else {
+      await this.jsonService.generateMultipleCirclesJson(
+        Array.from(this.selectedCircles),
+      );
+    }
   }
 
   async extractSummary() {
@@ -175,14 +240,16 @@ export class MyCirclesComponent implements OnInit {
           name: 'startDate',
           type: 'date',
           placeholder: 'من تاريخ',
-          value: new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split('T')[0]
+          value: new Date(new Date().setMonth(new Date().getMonth() - 1))
+            .toISOString()
+            .split('T')[0],
         },
         {
           name: 'endDate',
           type: 'date',
           placeholder: 'إلى تاريخ',
-          value: new Date().toISOString().split('T')[0]
-        }
+          value: new Date().toISOString().split('T')[0],
+        },
       ],
       buttons: [
         { text: 'إلغاء', role: 'cancel' },
@@ -192,15 +259,16 @@ export class MyCirclesComponent implements OnInit {
             if (data.startDate && data.endDate) {
               const allStudents: any[] = [];
               const allHomeworks: any[] = [];
-              
+
               for (const circleId of this.selectedCircles) {
-                const students = await this.studentRepo.findByCircleId(circleId);
+                const students =
+                  await this.studentRepo.findByCircleId(circleId);
                 allStudents.push(...students);
                 for (const st of students) {
-                   if (st.id) {
-                     const hws = await this.homeworkRepo.findByStudentId(st.id);
-                     allHomeworks.push(...hws);
-                   }
+                  if (st.id) {
+                    const hws = await this.homeworkRepo.findByStudentId(st.id);
+                    allHomeworks.push(...hws);
+                  }
                 }
               }
 
@@ -208,27 +276,34 @@ export class MyCirclesComponent implements OnInit {
               const endObj = new Date(data.endDate);
               endObj.setHours(23, 59, 59, 999);
               const end = endObj.getTime();
-              
-              const filteredHomeworks = allHomeworks.filter(h => {
+
+              const filteredHomeworks = allHomeworks.filter((h) => {
                 const d = new Date(h.date_assigned!).getTime();
                 return d >= start && d <= end;
               });
-              
+
               if (this.selectedCircles.size === 1) {
-                await this.excelService.generateCircleExcel(allStudents, filteredHomeworks);
+                await this.excelService.generateCircleExcel(
+                  allStudents,
+                  filteredHomeworks,
+                );
               } else {
-                await this.excelService.generateMultipleCirclesExcel(allStudents, filteredHomeworks);
+                await this.excelService.generateMultipleCirclesExcel(
+                  allStudents,
+                  filteredHomeworks,
+                );
               }
-          }
-        }}
-      ]
+            }
+          },
+        },
+      ],
     });
     await alert.present();
   }
 
   ngOnInit() {
-    this.fetchUserData();
+    this.fetchOwnerData();
     this.fetchCircles();
-    addIcons({ add, trash, shareSocial, documentText, close });
+    addIcons({ add, trash, shareSocial, documentText, close, pencil, people, 'albums-outline': albumsOutline, 'chevron-back': chevronBack, 'checkmark-circle': checkmarkCircle });
   }
 }

@@ -1,28 +1,26 @@
 import { Component, OnInit, inject } from '@angular/core';
 import {
   IonCard,
-  IonHeader,
-  IonToolbar,
-  IonButtons,
-  IonBackButton,
-  IonTitle,
-  IonContent,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardSubtitle,
   IonCardContent,
   AlertController,
   IonButton,
   IonIcon,
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import {
+  trash, shareSocial, documentText, close,
+  person, cloudUpload, checkmarkCircle, chevronBack,
+  cloudDownloadOutline,
+} from 'ionicons/icons';
 import {
   CircleRepository,
-  UserRepository,
   StudentRepository,
   HomeworkRepository,
   ExcelService,
-  User,
+  TeacherRepository,
+  Teacher,
   Circle,
+  JsonService,
 } from '@core';
 import { Router } from '@angular/router';
 
@@ -35,53 +33,59 @@ import { Router } from '@angular/router';
     IonIcon,
     IonButton,
     IonCard,
-    IonHeader,
-    IonToolbar,
-    IonButtons,
-    IonBackButton,
-    IonTitle,
-    IonContent,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardSubtitle,
     IonCardContent,
   ],
 })
 export class SharedCirclesComponent implements OnInit {
   constructor() {}
   private circleRepo = inject(CircleRepository);
-  private userRepo = inject(UserRepository);
+  private teacherRepo = inject(TeacherRepository);
   private studentRepo = inject(StudentRepository);
   private homeworkRepo = inject(HomeworkRepository);
   private excelService = inject(ExcelService);
   private alertCtrl = inject(AlertController);
   private router = inject(Router);
+  private jsonService = inject(JsonService);
 
   circles: Circle[] = [];
-  user: User | null = null;
+  teacher: Teacher | null = null;
+  teachers : Teacher[] = [];
 
   selectionMode = false;
-  selectedCircles: Set<number> = new Set();
+  selectedCircles: Set<string> = new Set();
   private pressTimer: any;
   private longPressActive = false;
 
   async fetchSharedCircles() {
     try {
       this.circles = await this.circleRepo.findAllSharedCircles();
+      console.log(this.circles);
+      
     } catch (error) {
       console.error(error);
     }
   }
 
-  async fetchUserData() {
+  async fetchTeacherData() {
     try {
-      const users = await this.userRepo.findByRole('USER');
-      this.user = users[0];
+      const teacher = await this.teacherRepo.findOwner();
+      this.teacher = teacher;
     } catch (error) {
       console.log(error);
     }
   }
 
+  async fetchTeachersData(){
+    try{
+      this.teachers = await this.teacherRepo.findAll();
+    }catch(error){
+      console.log(error);
+    }
+  }
+
+  findTeacherName(id: string){
+    return this.teachers.find((t) => t.id === id)?.name || "لا يوجد معلم";
+  }
   startPress(circle: Circle) {
     this.longPressActive = false;
     this.pressTimer = setTimeout(() => {
@@ -133,27 +137,98 @@ export class SharedCirclesComponent implements OnInit {
     this.selectedCircles.clear();
   }
 
-  deleteSelected() {
-    try {
-      for (const circleId of this.selectedCircles) {
-        this.circleRepo.delete(circleId);
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      this.fetchSharedCircles();
-    }
-    this.cancelSelection();
+
+
+    async deleteSelected() {
+    const count = this.selectedCircles.size;
+    const label = count === 1 ? 'هذه الحلقة' : `${count} حلقات`;
+
+    const alert = await this.alertCtrl.create({
+      header: 'تأكيد الحذف',
+      message: `هل أنت متأكد أنك تريد حذف ${label}؟ لا يمكن التراجع عن هذا الإجراء.`,
+      buttons: [
+        { text: 'إلغاء', role: 'cancel' },
+        {
+          text: 'حذف',
+          role: 'destructive',
+          cssClass: 'alert-button-danger',
+          handler: async () => {
+            try {
+              for (const circleId of this.selectedCircles) {
+                await this.circleRepo.delete(circleId);
+              }
+            } catch (error) {
+              console.log(error);
+            } finally {
+              await this.fetchSharedCircles();
+              this.cancelSelection();
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
   }
 
-  shareSelected() {
-    console.log('Share logic for', Array.from(this.selectedCircles));
-    // TODO: implement share logic
+
+  async shareSelected() {
+    if (this.selectedCircles.size === 0) return;
+    if (this.selectedCircles.size === 1) {
+      await this.jsonService.generateJson(
+        this.selectedCircles.values().next().value!,
+      );
+    } else {
+      await this.jsonService.generateMultipleCirclesJson(
+        Array.from(this.selectedCircles),
+      );
+    }
   }
 
   async importCircle() {
-   console.log("IMPORTING ...");
-   
+    const input = document.getElementById('fileImport') as HTMLInputElement;
+    if (input) {
+      input.click();
+    }
+  }
+
+  async onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e: any) => {
+      try {
+        const content = e.target.result;
+        const data = JSON.parse(content);
+        let circlesData = [];
+        if (Array.isArray(data)) {
+          circlesData = data;
+        } else {
+          circlesData = [data];
+        }
+
+        for (const circleData of circlesData) {
+          console.log("circleData ",circleData);
+          
+          await this.jsonService.importCircleData(circleData);
+        }
+        await this.fetchSharedCircles();
+        this.alertCtrl.create({
+          header: 'نجاح',
+          message: 'تم استيراد البيانات بنجاح',
+          buttons: ['حسنا']
+        }).then(a => a.present());
+      } catch (err) {
+        console.error(err);
+        this.alertCtrl.create({
+          header: 'خطأ',
+          message: 'فشل استيراد الملف. تأكد من صحة الملف.',
+          buttons: ['حسنا']
+        }).then(a => a.present());
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
   }
 
   async extractSummary() {
@@ -227,6 +302,14 @@ export class SharedCirclesComponent implements OnInit {
   }
   ngOnInit() {
     this.fetchSharedCircles();
-    this.fetchUserData();
+    this.fetchTeacherData();
+    this.fetchTeachersData();
+    addIcons({
+      trash, shareSocial, documentText, close,
+      person, 'cloud-upload': cloudUpload,
+      'checkmark-circle': checkmarkCircle,
+      'chevron-back': chevronBack,
+      'cloud-download-outline': cloudDownloadOutline,
+    });
   }
 }

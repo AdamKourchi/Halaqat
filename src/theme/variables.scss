@@ -1,2 +1,138 @@
-// For information on how to create your own theme, please refer to:
-// https://ionicframework.com/docs/theming/
+// ─────────────────────────────────────────────
+//  Halaqat — Design Tokens
+// ─────────────────────────────────────────────
+//0d9488
+:root {
+  // ── Primary (Teal) ────────────────────────
+  --ion-color-primary:         #0d9488;
+  --ion-color-primary-rgb:     13,148,136;
+  --ion-color-primary-contrast:#ffffff;
+  --ion-color-primary-contrast-rgb: 255,255,255;
+  --ion-color-primary-shade:   #0b8278;
+  --ion-color-primary-tint:    #25a89e;
+
+  // ── Secondary (Slate-blue) ────────────────
+  --ion-color-secondary:       #475569;
+  --ion-color-secondary-rgb:   71,85,105;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255,255,255;
+  --ion-color-secondary-shade: #3e4b5e;
+  --ion-color-secondary-tint:  #596678;
+
+  // ── Tertiary ──────────────────────────────
+  --ion-color-tertiary:        #6366f1;
+  --ion-color-tertiary-rgb:    99,102,241;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255,255,255;
+  --ion-color-tertiary-shade:  #5759d4;
+  --ion-color-tertiary-tint:   #7375f3;
+
+  // ── Success ───────────────────────────────
+  --ion-color-success:         #10b981;
+  --ion-color-success-rgb:     16,185,129;
+  --ion-color-success-contrast:#ffffff;
+  --ion-color-success-contrast-rgb: 255,255,255;
+  --ion-color-success-shade:   #0ea371;
+  --ion-color-success-tint:    #28c08e;
+
+  // ── Warning ───────────────────────────────
+  --ion-color-warning:         #f59e0b;
+  --ion-color-warning-rgb:     245,158,11;
+  --ion-color-warning-contrast:#ffffff;
+  --ion-color-warning-contrast-rgb: 255,255,255;
+  --ion-color-warning-shade:   #d88b0a;
+  --ion-color-warning-tint:    #f6a823;
+
+  // ── Danger ────────────────────────────────
+  --ion-color-danger:          #ef4444;
+  --ion-color-danger-rgb:      239,68,68;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255,255,255;
+  --ion-color-danger-shade:    #d23c3c;
+  --ion-color-danger-tint:     #f15757;
+
+  // ── Neutrals ──────────────────────────────
+  --ion-color-medium:          #94a3b8;
+  --ion-color-medium-rgb:      148,163,184;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-shade:    #829099;
+  --ion-color-medium-tint:     #9facc1;
+
+  --ion-color-light:           #f1f5f9;
+  --ion-color-light-rgb:       241,245,249;
+  --ion-color-light-contrast:  #1e293b;
+  --ion-color-light-shade:     #d4dae3;
+  --ion-color-light-tint:      #f2f6fa;
+
+  // ── App Background ────────────────────────
+  --ion-background-color:      #f8fafc;
+  --ion-background-color-rgb:  248,250,252;
+
+  --ion-text-color:            #1e293b;
+  --ion-text-color-rgb:        30,41,59;
+
+  // ── Toolbar ───────────────────────────────
+  --ion-toolbar-background:    #ffffff;
+  --ion-toolbar-color:         #1e293b;
+
+  // ── Card surface ──────────────────────────
+  --ion-card-background:       #ffffff;
+
+  // ── Item background ───────────────────────
+  --ion-item-background:       #ffffff;
+
+  // ── Custom tokens ─────────────────────────
+  --halaqat-border-radius:     14px;
+  --halaqat-card-shadow:       0 2px 12px rgba(0,0,0,0.07);
+  --halaqat-surface:           #ffffff;
+  --halaqat-divider:           #e2e8f0;
+}
+
+// ─────────────────────────────────────────────
+//  Dark Mode overrides
+// ─────────────────────────────────────────────
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ion-background-color:    #0f172a;
+    --ion-background-color-rgb:15,23,42;
+
+    --ion-text-color:          #e2e8f0;
+    --ion-text-color-rgb:      226,232,240;
+
+    --ion-toolbar-background:  #1e293b;
+    --ion-toolbar-color:       #e2e8f0;
+
+    --ion-card-background:     #1e293b;
+    --ion-item-background:     #1e293b;
+
+    --ion-color-step-50:       #1e293b;
+    --ion-color-step-100:      #263040;
+    --ion-color-step-150:      #2e3b4e;
+    --ion-color-step-200:      #364657;
+    --ion-color-step-250:      #3f5060;
+    --ion-color-step-300:      #475b69;
+    --ion-color-step-350:      #4f6672;
+    --ion-color-step-400:      #58717c;
+    --ion-color-step-450:      #607c85;
+    --ion-color-step-500:      #68868e;
+    --ion-color-step-550:      #719197;
+    --ion-color-step-600:      #799ca0;
+    --ion-color-step-650:      #81a7a9;
+    --ion-color-step-700:      #8ab2b3;
+    --ion-color-step-750:      #92bdbc;
+    --ion-color-step-800:      #9ac8c5;
+    --ion-color-step-850:      #a2d3ce;
+    --ion-color-step-900:      #abddd8;
+    --ion-color-step-950:      #b3e8e1;
+
+    --halaqat-surface:         #1e293b;
+    --halaqat-divider:         #334155;
+    --halaqat-card-shadow:     0 2px 12px rgba(0,0,0,0.25);
+
+    --ion-color-light:         #1e293b;
+    --ion-color-light-rgb:     30,41,59;
+    --ion-color-light-contrast:#e2e8f0;
+    --ion-color-light-shade:   #1a2638;
+    --ion-color-light-tint:    #253044;
+  }
+}

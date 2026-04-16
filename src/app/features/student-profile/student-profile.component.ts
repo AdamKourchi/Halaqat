@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -9,6 +9,7 @@ import {
   trashOutline,
   documentTextOutline,
   createOutline,
+  closeOutline,
 } from 'ionicons/icons';
 import {
   IonHeader,
@@ -26,16 +27,12 @@ import {
   IonCardHeader,
   IonCardTitle,
   IonCardContent,
-  IonList,
-  IonItemSliding,
-  IonItemOptions,
-  IonItemOption,
   IonDatetime,
   AlertController,
   ToastController,
   IonModal,
   IonDatetimeButton,
-  IonBadge, IonFooter } from '@ionic/angular/standalone';
+  IonBadge, IonFooter, ModalController } from '@ionic/angular/standalone';
 import {
   StudentRepository,
   HomeworkRepository,
@@ -50,7 +47,6 @@ import {
   styleUrls: ['./student-profile.component.scss'],
   standalone: true,
   imports: [IonFooter, 
-    IonBadge,
     IonDatetimeButton,
     CommonModule,
     FormsModule,
@@ -69,10 +65,6 @@ import {
     IonCardHeader,
     IonCardTitle,
     IonCardContent,
-    IonList,
-    IonItemSliding,
-    IonItemOptions,
-    IonItemOption,
     IonDatetime,
     IonModal,
   ],
@@ -85,8 +77,11 @@ export class StudentProfileComponent implements OnInit {
   private excelService = inject(ExcelService);
   private alertCtrl = inject(AlertController);
   private toastCtrl = inject(ToastController);
+  private modalCtrl = inject(ModalController);
 
-  studentId = Number(this.route.snapshot.paramMap.get('id'));
+  @Input() studentId?: string;
+  @Input() isModal: boolean = false;
+  
   student: Student | null = null;
   homeworks: Homework[] = [];
 
@@ -103,7 +98,11 @@ export class StudentProfileComponent implements OnInit {
       trash: trashOutline,
       'document-text': documentTextOutline,
       create: createOutline,
+      close: closeOutline,
     });
+    if (!this.studentId) {
+      this.studentId = this.route.snapshot.paramMap.get('id') as string;
+    }
     this.loadData();
   }
 
@@ -158,7 +157,11 @@ export class StudentProfileComponent implements OnInit {
         if (hw.id) await this.homeworkRepo.delete(hw.id);
       }
       await this.studentRepo.delete(this.student.id);
-      this.router.navigate(['/circle-details', this.student.circle_id]);
+      if (this.isModal) {
+         this.modalCtrl.dismiss({ deleted: true });
+      } else {
+         this.router.navigate(['/circle-details', this.student.circle_id]);
+      }
     } catch (e) {
       console.error(e);
     }
@@ -224,7 +227,9 @@ export class StudentProfileComponent implements OnInit {
   }
 
   back() {
-    if (this.student && this.student.circle_id) {
+    if (this.isModal) {
+      this.modalCtrl.dismiss();
+    } else if (this.student && this.student.circle_id) {
       this.router.navigate(['/circle-details', this.student.circle_id]);
     } else {
       this.router.navigate(['/home']);

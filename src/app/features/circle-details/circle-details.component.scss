@@ -1,4 +1,149 @@
-.selected-card {
-  --background: rgba(var(--ion-color-primary-rgb), 0.1);
-  border: 2px solid var(--ion-color-primary);
+// ── Circle Header ────────────────────────────
+.circle-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0 14px;
+  border-bottom: 1px solid var(--halaqat-divider);
+  margin-bottom: 8px;
+}
+
+.circle-header-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.circle-detail-avatar {
+  width: 52px;
+  height: 52px;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.circle-detail-name {
+  margin: 0 0 4px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ion-text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
+.circle-detail-supervisor {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--ion-color-medium);
+
+  ion-icon {
+    font-size: 0.95rem;
+  }
+}
+
+.circle-header-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.student-count-badge {
+  background: rgba(var(--ion-color-primary-rgb), 0.1);
+  color: var(--ion-color-primary);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+// ── Filter Segment ───────────────────────────
+.filter-segment {
+  margin: 8px 0 12px;
+
+  ion-segment-button {
+    font-size: 0.8rem;
+    --padding-start: 10px;
+    --padding-end:   10px;
+    min-width: 70px;
+  }
+}
+
+// ── Student Cards ────────────────────────────
+.student-card-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.student-avatar {
+  width: 44px;
+  height: 44px;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.avatar-male {
+  background: linear-gradient(135deg, #0d9488, #0891b2);
+}
+
+.avatar-female {
+  background: linear-gradient(135deg, #7c3aed, #c026d3);
+}
+
+.student-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.student-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.student-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ion-text-color);
+}
+
+.student-parent {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--ion-color-medium);
+
+  ion-icon {
+    font-size: 0.85rem;
+  }
+}
+
+.chevron-icon {
+  color: var(--ion-color-medium);
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.selected-check {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.page-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--ion-color-primary);
 }

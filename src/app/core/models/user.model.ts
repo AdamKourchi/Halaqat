@@ -2,7 +2,7 @@
  * User model – matches the `users` table schema.
  */
 export interface User {
-  id?: number;
+  id?: string;
   username: string;
   password_hash: string;
   role: 'ADMIN' | 'TEACHER' | string;

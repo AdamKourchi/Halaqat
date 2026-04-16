@@ -14,9 +14,9 @@ export const migration002: Migration = {
     // ── teachers ───────────────────────────────────────────────────────────
     await db.execute(`
       CREATE TABLE IF NOT EXISTS teachers (
-        id           INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id      INTEGER REFERENCES users(id) ON DELETE SET NULL,
+        id           TEXT PRIMARY KEY,
         name         TEXT    NOT NULL,
+        is_owner     BOOLEAN NOT NULL DEFAULT 0,
         contact_info TEXT
       );
     `);
@@ -24,8 +24,8 @@ export const migration002: Migration = {
     // ── circles ────────────────────────────────────────────────────────────
     await db.execute(`
       CREATE TABLE IF NOT EXISTS circles (
-        id            INTEGER PRIMARY KEY AUTOINCREMENT,
-        teacher_id    INTEGER NOT NULL REFERENCES teachers(id) ON DELETE CASCADE,
+        id            TEXT PRIMARY KEY,
+        teacher_id    TEXT NOT NULL REFERENCES teachers(id) ON DELETE CASCADE,
         name          TEXT    NOT NULL,
         type          TEXT    NOT NULL,
         creation_date TEXT    NOT NULL DEFAULT (date('now'))
@@ -35,8 +35,8 @@ export const migration002: Migration = {
     // ── students ───────────────────────────────────────────────────────────
     await db.execute(`
       CREATE TABLE IF NOT EXISTS students (
-        id              INTEGER PRIMARY KEY AUTOINCREMENT,
-        circle_id       INTEGER NOT NULL REFERENCES circles(id) ON DELETE CASCADE,
+        id              TEXT PRIMARY KEY,
+        circle_id       TEXT NOT NULL REFERENCES circles(id) ON DELETE CASCADE,
         name            TEXT    NOT NULL,
         gender          TEXT    NOT NULL,
         enlistment_date TEXT    NOT NULL DEFAULT (date('now')),
@@ -48,9 +48,9 @@ export const migration002: Migration = {
     // ── homeworks ──────────────────────────────────────────────────────────
     await db.execute(`
       CREATE TABLE IF NOT EXISTS homeworks (
-        id             INTEGER PRIMARY KEY AUTOINCREMENT,
-        student_id     INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
-        circle_id      INTEGER          REFERENCES circles(id)  ON DELETE SET NULL,
+        id             TEXT PRIMARY KEY,
+        student_id     TEXT NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+        circle_id      TEXT          REFERENCES circles(id)  ON DELETE SET NULL,
         date_assigned  TEXT    NOT NULL DEFAULT (date('now')),
         start_surah    INTEGER NOT NULL,
         start_ayah     INTEGER NOT NULL,
@@ -66,8 +66,8 @@ export const migration002: Migration = {
     // ── student_mushaf_progress ────────────────────────────────────────────
     await db.execute(`
       CREATE TABLE IF NOT EXISTS student_mushaf_progress (
-        id                  INTEGER PRIMARY KEY AUTOINCREMENT,
-        student_id          INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+        id                  TEXT PRIMARY KEY,
+        student_id          TEXT NOT NULL REFERENCES students(id) ON DELETE CASCADE,
         surah_number        INTEGER NOT NULL CHECK (surah_number BETWEEN 1 AND 114),
         memorized_percentage REAL    NOT NULL DEFAULT 0.0,
         average_score       REAL    NOT NULL DEFAULT 0.0,

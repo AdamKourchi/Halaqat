@@ -2,8 +2,8 @@
 export type CircleType = 'Beginner' | 'Revision' | 'Adults' | string;
 
 export interface Circle {
-  id?: number;
-  teacher_id: number;
+  id?: string;
+  teacher_id: string;
   name: string;
   type: CircleType;
   creation_date?: string;

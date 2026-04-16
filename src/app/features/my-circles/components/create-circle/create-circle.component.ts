@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ModalController, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonItem, IonInput, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 
@@ -11,9 +11,9 @@ import { ModalController, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton
 })
 export class CreateCircleComponent {
   private modalCtrl = inject(ModalController);
-  circleName = '';  
-  circleType = '';
-
+  @Input() circleName = '';  
+  @Input() circleType = '';
+  @Input() isEdit = false;
 
   cancel() {
     return this.modalCtrl.dismiss(null, 'cancel');

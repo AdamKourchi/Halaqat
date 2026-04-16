@@ -1,0 +1,75 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>تقرير شامل للحلقات</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" dir="rtl">
+  <div style="margin-bottom: 20px;">
+    <p>حدد فترة التقرير:</p>
+    <ion-item>
+      <ion-input label="من تاريخ" type="date" [(ngModel)]="startDate"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-input label="إلى تاريخ" type="date" [(ngModel)]="endDate"></ion-input>
+    </ion-item>
+  </div>
+
+  @if (ownedCircles.length > 0) {
+    <ion-list>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-left: 16px;">
+        <ion-list-header>الحلقات الخاصة</ion-list-header>
+        <ion-button fill="clear" size="small" (click)="toggleAll(ownedCircles)">تحديد الكل</ion-button>
+      </div>
+      @for (circle of ownedCircles; track $index) {
+        <ion-item>
+          <ion-checkbox
+            slot="start"
+            [checked]="selectedCircleIds.has(circle.id!)"
+            (ionChange)="toggleCircle(circle.id!)"
+          ></ion-checkbox>
+          <ion-label>
+            <h2>{{ circle.name }}</h2>
+            <p>{{ circle.type }}</p>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  }
+
+  @if (sharedCircles.length > 0) {
+    <ion-list class="ion-margin-top">
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-left: 16px;">
+        <ion-list-header>الحلقات المشاركة</ion-list-header>
+        <ion-button fill="clear" size="small" (click)="toggleAll(sharedCircles)">تحديد الكل</ion-button>
+      </div>
+      @for (circle of sharedCircles; track $index) {
+        <ion-item>
+          <ion-checkbox
+            slot="start"
+            [checked]="selectedCircleIds.has(circle.id!)"
+            (ionChange)="toggleCircle(circle.id!)"
+          ></ion-checkbox>
+          <ion-label>
+            <h2>{{ circle.name }}</h2>
+            <p>{{ circle.type }} ({{ findTeacherName(circle.teacher_id) }})</p>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  }
+
+  @if (ownedCircles.length === 0 && sharedCircles.length === 0) {
+    <p class="ion-text-center ion-padding">لا توجد حلقات لعرضها.</p>
+  }
+
+  <ion-button expand="block" class="ion-margin-top" color="success" (click)="generateReport()">
+    <ion-icon name="document-text" slot="start"></ion-icon>
+    إنشاء تقرير Excel
+  </ion-button>
+</ion-content>

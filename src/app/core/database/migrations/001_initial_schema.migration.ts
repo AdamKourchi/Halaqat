@@ -22,15 +22,15 @@ export const migration001: Migration = {
     `);
 
     // ── users ──────────────────────────────────────────────────────────────
-    await db.execute(`
-      CREATE TABLE IF NOT EXISTS users (
-        id            INTEGER PRIMARY KEY AUTOINCREMENT,
-        username      TEXT    NOT NULL UNIQUE,
-        password_hash TEXT    NOT NULL,
-        role          TEXT    NOT NULL DEFAULT 'TEACHER',
-        created_at    TEXT    NOT NULL DEFAULT (datetime('now'))
-      );
-    `);
+    // await db.execute(`
+    //   CREATE TABLE IF NOT EXISTS users (
+    //     id            TEXT PRIMARY KEY,
+    //     username      TEXT    NOT NULL UNIQUE,
+    //     password_hash TEXT    NOT NULL,
+    //     role          TEXT    NOT NULL DEFAULT 'TEACHER',
+    //     created_at    TEXT    NOT NULL DEFAULT (datetime('now'))
+    //   );
+    // `);
   },
 
   async down(db: SQLiteDBConnection): Promise<void> {

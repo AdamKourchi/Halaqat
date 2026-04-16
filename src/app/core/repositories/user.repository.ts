@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BaseRepository } from './base.repository';
 import { User } from '../models/user.model';
+import { UuidHelper } from '../helpers';
 
 /**
  * UserRepository
@@ -9,12 +10,13 @@ import { User } from '../models/user.model';
  */
 @Injectable({ providedIn: 'root' })
 export class UserRepository extends BaseRepository {
+  private uuidHelper = inject(UuidHelper);
 
   async findAll(): Promise<User[]> {
     return this.query<User>('SELECT * FROM users ORDER BY id ASC');
   }
 
-  async findById(id: number): Promise<User | null> {
+  async findById(id: string): Promise<User | null> {
     const rows = await this.query<User>('SELECT * FROM users WHERE id = ?', [id]);
     return rows[0] ?? null;
   }
@@ -36,30 +38,32 @@ export class UserRepository extends BaseRepository {
    * @param passwordHash  Pre-hashed password (never store plaintext!)
    * @param role  'ADMIN' | 'TEACHER'
    */
-  async create(username: string, passwordHash: string, role: string = 'TEACHER'): Promise<number> {
+  async create(username: string, passwordHash: string, role: string = 'TEACHER'): Promise<string> {
    //make the user and the teacher with the same data
-   const id = await this.run(
-      `INSERT INTO users (username, password_hash, role)
-       VALUES (?, ?, ?)`,
-      [username, passwordHash, role]
+   const id = this.uuidHelper.generate();
+   await this.run(
+      `INSERT INTO users (id, username, password_hash, role)
+       VALUES (?, ?, ?, ?)`,
+      [id, username, passwordHash, role]
     );
+    const teacherId = this.uuidHelper.generate();
     await this.run(
-      `INSERT INTO teachers (user_id, name)
-       VALUES (?, ?)`,
-      [id, username]
+      `INSERT INTO teachers (id, user_id, name)
+       VALUES (?, ?, ?)`,
+      [teacherId, id, username]
     );
     return id;
   }
 
-  async updatePasswordHash(id: number, passwordHash: string): Promise<void> {
+  async updatePasswordHash(id: string, passwordHash: string): Promise<void> {
     await this.run('UPDATE users SET password_hash = ? WHERE id = ?', [passwordHash, id]);
   }
 
-  async updateRole(id: number, role: string): Promise<void> {
+  async updateRole(id: string, role: string): Promise<void> {
     await this.run('UPDATE users SET role = ? WHERE id = ?', [role, id]);
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: string): Promise<void> {
     await this.run('DELETE FROM users WHERE id = ?', [id]);
   }
 

@@ -26,7 +26,7 @@ export class ExcelService {
     }
   }
 
-  private async getCircleData(circleId: number) {
+  private async getCircleData(circleId: string) {
     const circle = await this.circleRepo.findById(circleId);
 
     let teacher = null;
@@ -149,7 +149,7 @@ export class ExcelService {
       }
     });
 
-    await this.saveAndShare(workbook, `Student_Summary_${student.name}.xlsx`);
+    await this.saveAndShare(workbook, `حصيلة_${student.name}.xlsx`);
   }
 
   async generateCircleExcel(students: Student[], homeworks: Homework[]) {
@@ -277,7 +277,7 @@ export class ExcelService {
 
     await this.saveAndShare(
       workbook,
-      `Circle_Summary_${circle?.name || 'Unknown'}_${new Date().getTime()}.xlsx`,
+      `حصيلة_حلقة_${circle?.name || 'Unknown'}_${new Date().getDate()}.xlsx`,
     );
   }
 
@@ -294,7 +294,7 @@ export class ExcelService {
     worksheet.views = [{ rightToLeft: true }];
 
     // Group students by circle ID
-    const studentsByCircle = new Map<number, Student[]>();
+    const studentsByCircle = new Map<string, Student[]>();
     for (const student of students) {
       if (!student.circle_id) continue;
       if (!studentsByCircle.has(student.circle_id)) {
@@ -414,7 +414,7 @@ export class ExcelService {
 
     await this.saveAndShare(
       workbook,
-      `Multiple_Circles_Summary_${new Date().getTime()}.xlsx`,
+      `تقرير_الحلقات_${new Date().getTime()}.xlsx`,
     );
   }
 

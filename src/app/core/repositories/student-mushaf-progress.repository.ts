@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BaseRepository } from './base.repository';
 import { StudentMushafProgress } from '../models/student-mushaf-progress.model';
+import { UuidHelper } from '../helpers';
 
 /** Numeric score mapping: Excellent=4, Very Good=3, Good=2, Needs Work=1 */
 export const GRADE_SCORES: Record<string, number> = {
@@ -17,9 +18,10 @@ export const GRADE_SCORES: Record<string, number> = {
  */
 @Injectable({ providedIn: 'root' })
 export class StudentMushafProgressRepository extends BaseRepository {
+  private uuidHelper = inject(UuidHelper);
 
   /** Get all surah progress rows for a student. */
-  async findByStudentId(studentId: number): Promise<StudentMushafProgress[]> {
+  async findByStudentId(studentId: string): Promise<StudentMushafProgress[]> {
     return this.query<StudentMushafProgress>(
       'SELECT * FROM student_mushaf_progress WHERE student_id = ? ORDER BY surah_number ASC',
       [studentId]
@@ -28,7 +30,7 @@ export class StudentMushafProgressRepository extends BaseRepository {
 
   /** Get progress for a specific student+surah combination. */
   async findByStudentAndSurah(
-    studentId: number,
+    studentId: string,
     surahNumber: number
   ): Promise<StudentMushafProgress | null> {
     const rows = await this.query<StudentMushafProgress>(
@@ -43,16 +45,18 @@ export class StudentMushafProgressRepository extends BaseRepository {
    * Upsert a progress record (INSERT or REPLACE).
    * Returns the row id.
    */
-  async upsert(progress: Omit<StudentMushafProgress, 'id'>): Promise<number> {
-    return this.run(
+  async upsert(progress: Omit<StudentMushafProgress, 'id'>): Promise<string> {
+    const id = this.uuidHelper.generate();
+    await this.run(
       `INSERT INTO student_mushaf_progress
-         (student_id, surah_number, memorized_percentage, average_score, last_reviewed_date)
-       VALUES (?, ?, ?, ?, ?)
+         (id, student_id, surah_number, memorized_percentage, average_score, last_reviewed_date)
+       VALUES (?, ?, ?, ?, ?, ?)
        ON CONFLICT(student_id, surah_number) DO UPDATE SET
          memorized_percentage = excluded.memorized_percentage,
          average_score        = excluded.average_score,
          last_reviewed_date   = excluded.last_reviewed_date`,
       [
+        id,
         progress.student_id,
         progress.surah_number,
         progress.memorized_percentage,
@@ -60,13 +64,14 @@ export class StudentMushafProgressRepository extends BaseRepository {
         progress.last_reviewed_date ?? new Date().toISOString().split('T')[0],
       ]
     );
+    return id;
   }
 
   /**
    * Recalculate and persist a student's average_score for a given surah
    * based on all graded homeworks that touch that surah.
    */
-  async recalculateFromHomeworks(studentId: number, surahNumber: number): Promise<void> {
+  async recalculateFromHomeworks(studentId: string, surahNumber: number): Promise<void> {
     // Pull all graded homeworks that overlap this surah
     const rows = await this.query<{ grade_mark: string }>(
       `SELECT grade_mark FROM homeworks
@@ -91,7 +96,7 @@ export class StudentMushafProgressRepository extends BaseRepository {
     });
   }
 
-  async delete(studentId: number, surahNumber: number): Promise<void> {
+  async delete(studentId: string, surahNumber: number): Promise<void> {
     await this.run(
       'DELETE FROM student_mushaf_progress WHERE student_id = ? AND surah_number = ?',
       [studentId, surahNumber]

@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { UserRepository } from '@core';
+import { TeacherRepository } from '@core';
 import { Router } from '@angular/router';
 import {
   IonHeader,
@@ -33,8 +33,8 @@ import {
 })
 export class RegisterComponent implements OnInit {
   name = '';
-  private userRepo = inject(UserRepository);
   private router = inject(Router);
+  private teacherRepo = inject(TeacherRepository);
 
 
   constructor() {}
@@ -43,7 +43,7 @@ export class RegisterComponent implements OnInit {
 
   register() {
     try {
-      this.userRepo.create(this.name, '123456', 'USER');
+      this.teacherRepo.create(null,this.name, '123456', true);
     } catch (error) {
       console.log(error);
     }finally{
