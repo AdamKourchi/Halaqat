@@ -4,6 +4,14 @@
 
 تطبيق متكامل لإدارة حلقات تحفيظ القرآن الكريم، مبني بتقنية **Ionic + Angular + Capacitor** للعمل على أجهزة **Android**.
 
+<p align="center">
+  <img src="screenshots/circlesCase.jpeg" width="22%" alt="حلقاتي" />
+  <img src="screenshots/circleDetailsCase.jpeg" width="22%" alt="تفاصيل الحلقة" />
+  <img src="screenshots/homeworkCase.jpeg" width="22%" alt="الواجبات" />
+  <img src="screenshots/upsertCase.jpeg" width="22%" alt="إضافة بيانات" />
+</p>
+
+
 ---
 
 ## ✨ المميزات الرئيسية
