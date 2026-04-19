@@ -89,21 +89,20 @@
 }
 
 // ─────────────────────────────────────────────
-//  Dark Mode overrides
+//  Dark Mode overrides  (driven by .dark class on <html>)
 // ─────────────────────────────────────────────
-@media (prefers-color-scheme: dark) {
-  :root {
-    --ion-background-color:    #0f172a;
-    --ion-background-color-rgb:15,23,42;
+:root.dark {
+    --ion-background-color:    #121212; //    #0f172a;
+    --ion-background-color-rgb:18,18,18;
 
     --ion-text-color:          #e2e8f0;
     --ion-text-color-rgb:      226,232,240;
 
-    --ion-toolbar-background:  #1e293b;
+    --ion-toolbar-background:  #1e1e1e;
     --ion-toolbar-color:       #e2e8f0;
 
-    --ion-card-background:     #1e293b;
-    --ion-item-background:     #1e293b;
+    --ion-card-background:     #1e1e1e;
+    --ion-item-background:     #1e1e1e;
 
     --ion-color-step-50:       #1e293b;
     --ion-color-step-100:      #263040;
@@ -134,5 +133,4 @@
     --ion-color-light-contrast:#e2e8f0;
     --ion-color-light-shade:   #1a2638;
     --ion-color-light-tint:    #253044;
-  }
 }

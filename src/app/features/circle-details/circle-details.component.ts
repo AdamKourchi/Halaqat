@@ -39,6 +39,7 @@ import {
   peopleOutline,
   chevronBack,
   checkmarkCircle,
+  bookOutline,
 } from 'ionicons/icons';
 import { CreateStudentComponent } from './components/create-student/create-student.component';
 import { StudentHomeworkComponent } from './components/student-homework/student-homework.component';
@@ -346,6 +347,7 @@ export class CircleDetailsComponent implements OnInit {
       'people-outline': peopleOutline,
       'chevron-back': chevronBack,
       'checkmark-circle': checkmarkCircle,
+      'book-outline': bookOutline,
     });
     this.cancelSelection();
     await this.fetchCircle();

@@ -15,21 +15,25 @@
   <div class="selection-bar">
     <div class="rtl-row" style="gap: 4px">
       @if (!isSharedCircle) {
-      <ion-button fill="outline" color="danger" (click)="deleteSelected()">
+      <ion-button size="small" fill="solid" color="danger" (click)="deleteSelected()">
+        <ion-icon name="trash" slot="start"></ion-icon>
         حذف
       </ion-button>
       }
       <!-- <ion-button fill="clear" color="primary" (click)="shareSelected()">
           <ion-icon name="share-social" slot="icon-only"></ion-icon>
         </ion-button> -->
-      <ion-button fill="outline" color="secondary" (click)="extractSummary()">
+      <ion-button size="small" fill="solid" color="success" (click)="extractSummary()">
+        <ion-icon name="document-text" slot="start"></ion-icon>
         تقرير
       </ion-button>
       @if (!isSharedCircle && selectedStudents.size === 1) {
-      <ion-button fill="outline" color="primary" (click)="editSelected()">
+      <ion-button size="small" fill="solid" color="primary" (click)="editSelected()">
+        <ion-icon name="pencil" slot="start"></ion-icon>
         تعديل
       </ion-button>
-      <ion-button fill="outline" color="warning" (click)="openHomeworks()">
+      <ion-button size="small" fill="solid" color="warning" (click)="openHomeworks()">
+        <ion-icon name="book-outline" slot="start"></ion-icon>
         واجبات
       </ion-button>
       }
