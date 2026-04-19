@@ -32,4 +32,11 @@ export const routes: Routes = [
         (m) => m.StudentProfileComponent,
       ),
   },
+  {
+    path: 'homeworks/:id',
+    loadComponent: () =>
+      import('./features/homeworks/homeworks.component').then(
+        (m) => m.HomeworksComponent,
+      ),
+  },
 ];

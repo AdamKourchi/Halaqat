@@ -213,6 +213,7 @@ export class SharedCirclesComponent implements OnInit {
           await this.jsonService.importCircleData(circleData);
         }
         await this.fetchSharedCircles();
+        await this.fetchTeachersData();
         this.alertCtrl.create({
           header: 'نجاح',
           message: 'تم استيراد البيانات بنجاح',

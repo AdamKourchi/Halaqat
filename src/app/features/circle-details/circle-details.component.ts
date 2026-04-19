@@ -8,7 +8,7 @@ import {
   StudentRepository,
   HomeworkRepository,
   ExcelService,
-  TeacherRepository
+  TeacherRepository,
 } from '@core';
 import {
   IonHeader,
@@ -18,15 +18,12 @@ import {
   IonButton,
   IonIcon,
   IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardSubtitle,
   IonCardContent,
   ModalController,
   AlertController,
   IonBadge,
   IonSegment,
-  IonSegmentButton
+  IonSegmentButton,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -60,7 +57,7 @@ import { StudentProfileComponent } from '../student-profile/student-profile.comp
     IonTitle,
     IonContent,
     IonSegment,
-    IonSegmentButton
+    IonSegmentButton,
   ],
   selector: 'app-circle-details',
   templateUrl: './circle-details.component.html',
@@ -71,7 +68,7 @@ export class CircleDetailsComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private circleRepo = inject(CircleRepository);
-  private teacherRepo = inject(TeacherRepository)
+  private teacherRepo = inject(TeacherRepository);
   private studentRepo = inject(StudentRepository);
   private homeworkRepo = inject(HomeworkRepository);
   private excelService = inject(ExcelService);
@@ -82,7 +79,7 @@ export class CircleDetailsComponent implements OnInit {
   circle: Circle | null = null;
   teacher: Teacher | null = null;
   students: Student[] = [];
-  teachers : Teacher[] = [];
+  teachers: Teacher[] = [];
 
   selectionMode = false;
   selectedStudents: Set<string> = new Set();
@@ -110,7 +107,7 @@ export class CircleDetailsComponent implements OnInit {
   }
 
   findTeacherName(id: string | null): string {
-    return this.teachers.find(t => t.id === id)?.name || '';
+    return this.teachers.find((t) => t.id === id)?.name || '';
   }
 
   async fetchCircle() {
@@ -148,7 +145,7 @@ export class CircleDetailsComponent implements OnInit {
             data.name,
             data.gender,
             data.parent_name,
-            data.parent_contact,
+            data.parent_contact
           );
         }
       } catch (error) {
@@ -234,9 +231,9 @@ export class CircleDetailsComponent implements OnInit {
               await this.fetchStudents();
               this.cancelSelection();
             }
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
     await alert.present();
   }
@@ -247,15 +244,15 @@ export class CircleDetailsComponent implements OnInit {
 
   async editSelected() {
     if (this.selectedStudents.size !== 1) return;
-    
+
     const studentId = Array.from(this.selectedStudents)[0];
-    
+
     const modal = await this.modalCtrl.create({
       component: StudentProfileComponent,
       componentProps: {
         studentId: studentId,
-        isModal: true
-      }
+        isModal: true,
+      },
     });
 
     await modal.present();
@@ -276,14 +273,16 @@ export class CircleDetailsComponent implements OnInit {
           name: 'startDate',
           type: 'date',
           placeholder: 'من تاريخ',
-          value: new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split('T')[0]
+          value: new Date(new Date().setMonth(new Date().getMonth() - 1))
+            .toISOString()
+            .split('T')[0],
         },
         {
           name: 'endDate',
           type: 'date',
           placeholder: 'إلى تاريخ',
-          value: new Date().toISOString().split('T')[0]
-        }
+          value: new Date().toISOString().split('T')[0],
+        },
       ],
       buttons: [
         { text: 'إلغاء', role: 'cancel' },
@@ -291,31 +290,44 @@ export class CircleDetailsComponent implements OnInit {
           text: 'إنشاء التقرير',
           handler: async (data) => {
             if (data.startDate && data.endDate) {
-              const studentsList = this.students.filter(s => s.id && this.selectedStudents.has(s.id));
+              const studentsList = this.students.filter(
+                (s) => s.id && this.selectedStudents.has(s.id)
+              );
               const allHomeworks: any[] = [];
               for (const student of studentsList) {
-                const hws = await this.homeworkRepo.findByStudentId(student.id!);
+                const hws = await this.homeworkRepo.findByStudentId(
+                  student.id!
+                );
                 allHomeworks.push(...hws);
               }
               const start = new Date(data.startDate).getTime();
               const endObj = new Date(data.endDate);
               endObj.setHours(23, 59, 59, 999);
               const end = endObj.getTime();
-              
-              const filteredHomeworks = allHomeworks.filter(h => {
+
+              const filteredHomeworks = allHomeworks.filter((h) => {
                 const d = new Date(h.date_assigned!).getTime();
                 return d >= start && d <= end;
               });
-              
-              await this.excelService.generateCircleExcel(studentsList, filteredHomeworks);
+
+              await this.excelService.generateCircleExcel(
+                studentsList,
+                filteredHomeworks
+              );
             }
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
     await alert.present();
   }
+  openHomeworks() {
+    if (this.selectedStudents.size !== 1) return;
 
+    const studentId = Array.from(this.selectedStudents)[0];
+
+    this.router.navigate(['/homeworks', studentId]);
+  }
   back() {
     this.router.navigate(['/home']);
   }
@@ -335,6 +347,7 @@ export class CircleDetailsComponent implements OnInit {
       'chevron-back': chevronBack,
       'checkmark-circle': checkmarkCircle,
     });
+    this.cancelSelection();
     await this.fetchCircle();
     this.fetchTeacher();
     this.fetchTeachers();
@@ -342,16 +355,24 @@ export class CircleDetailsComponent implements OnInit {
   }
 
   // Filter state
-  filterType: 'all' | 'Male' | 'Female' | 'graded_today' | 'not_graded' | 'no_homework' = 'all';
+  filterType:
+    | 'all'
+    | 'Male'
+    | 'Female'
+    | 'graded_today'
+    | 'not_graded'
+    | 'no_homework' = 'all';
 
   get filteredStudents(): Student[] {
-    return this.students.filter(student => {
+    return this.students.filter((student) => {
       if (this.filterType === 'all') return true;
       if (this.filterType === 'Male') return student.gender === 'Male';
       if (this.filterType === 'Female') return student.gender === 'Female';
-      if (this.filterType === 'not_graded') return !!student.has_ungraded_homework && !student.is_graded_today;
+      if (this.filterType === 'not_graded')
+        return !!student.has_ungraded_homework && !student.is_graded_today;
       if (this.filterType === 'graded_today') return !!student.is_graded_today;
-      if (this.filterType === 'no_homework') return !student.has_ungraded_homework && !student.is_graded_today;
+      if (this.filterType === 'no_homework')
+        return !student.has_ungraded_homework && !student.is_graded_today;
       return true;
     });
   }
@@ -366,8 +387,8 @@ export class CircleDetailsComponent implements OnInit {
       componentProps: {
         student,
         circleId: this.circleId,
-        isSharedCircle: this.isSharedCircle
-      }
+        isSharedCircle: this.isSharedCircle,
+      },
     });
 
     await modal.present();

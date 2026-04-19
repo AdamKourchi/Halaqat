@@ -53,51 +53,6 @@
       </ion-card-content>
     </ion-card>
 
-    <!-- Excel Export Section -->
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>تقرير إكسيل (Excel)</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <div style="display: flex; align-items: center;justify-content: center; gap: 30px; ">
-            <ion-datetime-button datetime="datetime-start"></ion-datetime-button>
-            <ion-modal [keepContentsMounted]="true">
-              <ng-template>
-                <ion-datetime
-                  id="datetime-start"
-                  name="startDate"
-                  presentation="date"
-                  [(ngModel)]="startDate"
-                  [showDefaultButtons]="true"
-                  doneText="تم"
-                  cancelText="إلغاء">
-                </ion-datetime>
-              </ng-template>
-            </ion-modal>
-            <ion-datetime-button datetime="datetime-end"></ion-datetime-button>
-            <ion-modal [keepContentsMounted]="true">
-              <ng-template>
-                <ion-datetime
-                  id="datetime-end"
-                  name="endDate"
-                  presentation="date"
-                  [(ngModel)]="endDate"
-                  [showDefaultButtons]="true"
-                  doneText="تم"
-                  cancelText="إلغاء">
-                </ion-datetime>
-              </ng-template>
-            </ion-modal>
-        </div>
-        <div style="display: flex; align-items: center;justify-content: center; margin-top: 10px;">
-          <ion-button color="success" (click)="generateExcel()">
-            <ion-icon name="document-text" slot="start"></ion-icon>
-            توليد ملف الإكسيل
-          </ion-button>
-        </div>
-      </ion-card-content>
-    </ion-card>
-
   } @else {
     <div class="ion-text-center ion-padding">
       <p>جاري تحميل البيانات...</p>

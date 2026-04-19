@@ -3,3 +3,5 @@ ionic capacitor run android -l --external
 adb kill-server
 adb start-server
 adb devices
+
+npx cap open android

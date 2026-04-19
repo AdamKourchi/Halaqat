@@ -27,18 +27,12 @@ import {
   IonCardHeader,
   IonCardTitle,
   IonCardContent,
-  IonDatetime,
   AlertController,
   ToastController,
-  IonModal,
-  IonDatetimeButton,
-  IonBadge, IonFooter, ModalController } from '@ionic/angular/standalone';
+  IonFooter, ModalController } from '@ionic/angular/standalone';
 import {
   StudentRepository,
-  HomeworkRepository,
-  ExcelService,
   Student,
-  Homework,
 } from '@core';
 
 @Component({
@@ -47,7 +41,6 @@ import {
   styleUrls: ['./student-profile.component.scss'],
   standalone: true,
   imports: [IonFooter, 
-    IonDatetimeButton,
     CommonModule,
     FormsModule,
     IonHeader,
@@ -65,16 +58,13 @@ import {
     IonCardHeader,
     IonCardTitle,
     IonCardContent,
-    IonDatetime,
-    IonModal,
+
   ],
 })
 export class StudentProfileComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private studentRepo = inject(StudentRepository);
-  private homeworkRepo = inject(HomeworkRepository);
-  private excelService = inject(ExcelService);
   private alertCtrl = inject(AlertController);
   private toastCtrl = inject(ToastController);
   private modalCtrl = inject(ModalController);
@@ -83,7 +73,6 @@ export class StudentProfileComponent implements OnInit {
   @Input() isModal: boolean = false;
   
   student: Student | null = null;
-  homeworks: Homework[] = [];
 
   // Date range for Excel export
   startDate: string = new Date(
@@ -109,10 +98,8 @@ export class StudentProfileComponent implements OnInit {
   async loadData() {
     if (this.studentId) {
       this.student = await this.studentRepo.findById(this.studentId);
-      this.homeworks = await this.homeworkRepo.findByStudentId(this.studentId);
     }
   }
-
   async saveStudent() {
     if (!this.student || !this.student.id) return;
     try {
@@ -152,10 +139,6 @@ export class StudentProfileComponent implements OnInit {
   async deleteStudent() {
     if (!this.student || !this.student.id) return;
     try {
-      // First delete all homeworks (if cascade is not enabled)
-      for (const hw of this.homeworks) {
-        if (hw.id) await this.homeworkRepo.delete(hw.id);
-      }
       await this.studentRepo.delete(this.student.id);
       if (this.isModal) {
          this.modalCtrl.dismiss({ deleted: true });
@@ -164,65 +147,6 @@ export class StudentProfileComponent implements OnInit {
       }
     } catch (e) {
       console.error(e);
-    }
-  }
-
-  async deleteHomework(hw: Homework) {
-    if (!hw.id) return;
-    const alert = await this.alertCtrl.create({
-      header: 'تأكيد الحذف',
-      message: 'هل أنت متأكد من حذف هذا الواجب؟',
-      buttons: [
-        { text: 'إلغاء', role: 'cancel' },
-        {
-          text: 'حذف',
-          role: 'destructive',
-          handler: async () => {
-            if (hw.id) {
-              await this.homeworkRepo.delete(hw.id);
-              this.loadData();
-            }
-          },
-        },
-      ],
-    });
-    await alert.present();
-  }
-
-  async generateExcel() {
-    if (!this.student) return;
-    // Filter homeworks by selected date range
-    const start = new Date(this.startDate).getTime();
-    // Set end to end of day
-    const endObj = new Date(this.endDate);
-    endObj.setHours(23, 59, 59, 999);
-    const end = endObj.getTime();
-
-    const filtered = this.homeworks.filter((h) => {
-      const d = new Date(h.date_assigned!).getTime();
-      return d >= start && d <= end;
-    });
-
-    if (filtered.length === 0) {
-      const toast = await this.toastCtrl.create({
-        message: 'لا توجد واجبات في هذه الفترة',
-        duration: 2000,
-        color: 'warning',
-      });
-      toast.present();
-      return;
-    }
-
-    try {
-      await this.excelService.generateStudentExcel(this.student, filtered);
-    } catch (e) {
-      console.error(e);
-      const toast = await this.toastCtrl.create({
-        message: 'حدث خطأ أثناء إنشاء التقرير' + e,
-        duration: 2000,
-        color: 'danger',
-      });
-      toast.present();
     }
   }
 

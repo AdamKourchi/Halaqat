@@ -67,6 +67,7 @@ export class StudentRepository extends BaseRepository {
   }
 
   async delete(id: string): Promise<void> {
+    await this.run('DELETE FROM homeworks WHERE student_id = ?', [id]);
     await this.run('DELETE FROM students WHERE id = ?', [id]);
   }
 

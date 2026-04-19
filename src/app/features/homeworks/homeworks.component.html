@@ -1,0 +1,59 @@
+<ion-header translucent>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="'/circle-details/' + circleId"></ion-back-button>
+    </ion-buttons>
+    <ion-title>واجبات الطالب: {{ student?.name }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen class="ion-padding">
+  @if (student) {
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>قائمة الواجبات</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      @if (homeworks.length > 0) {
+      <ion-list>
+        @for (hw of homeworks; track hw.id) {
+        <ion-item>
+          <ion-label>
+            <div style="display: flex; align-items: center; gap: 10px">
+              <h2>{{ getSurahName(hw.start_surah) + " " + hw.start_ayah }}</h2>
+              <ion-icon name="arrow-forward"></ion-icon>
+              <h2>{{ getSurahName(hw.end_surah) + " " + hw.end_ayah }}</h2>
+            </div>
+            <p>
+              الحالة: @if (hw.grade_mark) {
+              <span style="color: green">سمّع</span>
+              <p>تاريخ التسميع: {{ hw.graded_date | date : "yyyy-MM-dd" }}</p>
+              <p>عدد الأخطاء: {{ hw.mistakes_count }}</p>
+              <p>التقييم: {{ gradingMarksHelper.getMarkLabel(hw.grade_mark) }}</p>
+              <p>الملاحظات: {{ hw.remark }}</p>
+              } @else {
+              <span style="color: red">لم يسمّع</span>
+              <p>تاريخ التكليف: {{ hw.date_assigned | date : "yyyy-MM-dd" }}</p>
+
+              }
+            </p>
+          </ion-label>
+          <ion-button fill="clear" color="danger" (click)="deleteHomework(hw)">
+            <ion-icon name="trash"></ion-icon>
+          </ion-button>
+        </ion-item>
+        }
+      </ion-list>
+      } @else {
+      <div class="ion-text-center ion-padding">
+        <p>لا توجد واجبات مسجلة لهذا الطالب.</p>
+      </div>
+      }
+    </ion-card-content>
+  </ion-card>
+  } @else {
+  <div class="ion-text-center ion-padding">
+    <p>جاري تحميل البيانات...</p>
+  </div>
+  }
+</ion-content>
