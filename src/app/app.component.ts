@@ -3,7 +3,7 @@ import { Platform } from '@ionic/angular';
 import { IonApp, IonRouterOutlet, IonContent, IonSpinner } from '@ionic/angular/standalone';
 import { DatabaseService } from './core/database/database.service';
 import { Router } from '@angular/router';
-import { TeacherRepository, JsonService } from '@core';
+import { TeacherRepository, JsonService, ThemeService } from '@core';
 import { SendIntent } from '@mindlib-capacitor/send-intent';
 import { AlertController } from '@ionic/angular/standalone';
 import { Filesystem, Encoding } from '@capacitor/filesystem';
@@ -28,6 +28,8 @@ export class AppComponent {
   private teacherRepo = inject(TeacherRepository);
   private jsonService = inject(JsonService);
   private alertCtrl = inject(AlertController);
+  // Eagerly inject so the constructor runs and applies the stored theme on boot
+  private themeService = inject(ThemeService);
 
   constructor() {
     // 👉 2. INITIALIZE THE PROMISE

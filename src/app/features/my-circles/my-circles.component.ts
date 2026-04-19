@@ -8,7 +8,18 @@ import {
   AlertController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add, trash, shareSocial, documentText, close, pencil, people, albumsOutline, chevronBack, checkmarkCircle } from 'ionicons/icons';
+import {
+  add,
+  trash,
+  shareSocial,
+  documentText,
+  close,
+  pencil,
+  people,
+  albumsOutline,
+  chevronBack,
+  checkmarkCircle,
+} from 'ionicons/icons';
 import {
   CircleRepository,
   StudentRepository,
@@ -26,12 +37,7 @@ import { Router } from '@angular/router';
   templateUrl: './my-circles.component.html',
   styleUrls: ['./my-circles.component.scss'],
   standalone: true,
-  imports: [
-    IonButton,
-    IonCardContent,
-    IonCard,
-    IonIcon,
-  ],
+  imports: [IonButton, IonCardContent, IonCard, IonIcon],
 })
 export class MyCirclesComponent implements OnInit {
   private circleRepo = inject(CircleRepository);
@@ -58,12 +64,18 @@ export class MyCirclesComponent implements OnInit {
       this.circles = await this.circleRepo.findOwnerCircles();
       // Fetch student counts in parallel
       const counts = await Promise.all(
-        this.circles.map(c => c.id
-          ? this.studentRepo.findByCircleId(c.id).then(s => ({ id: c.id!, count: s.length }))
-          : Promise.resolve({ id: '', count: 0 })
+        this.circles.map((c) =>
+          c.id
+            ? this.studentRepo
+                .findByCircleId(c.id)
+                .then((s) => ({ id: c.id!, count: s.length }))
+            : Promise.resolve({ id: '', count: 0 })
         )
       );
-      this.studentCountMap = counts.reduce((acc, r) => { acc[r.id] = r.count; return acc; }, {} as Record<string, number>);
+      this.studentCountMap = counts.reduce((acc, r) => {
+        acc[r.id] = r.count;
+        return acc;
+      }, {} as Record<string, number>);
     } catch (error) {
       console.log(error);
     }
@@ -175,19 +187,19 @@ export class MyCirclesComponent implements OnInit {
               await this.fetchCircles();
               this.cancelSelection();
             }
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
     await alert.present();
   }
 
   async editSelected() {
     if (this.selectedCircles.size !== 1) return;
-    
+
     const circleId = Array.from(this.selectedCircles)[0];
-    const circle = this.circles.find(c => c.id === circleId);
-    
+    const circle = this.circles.find((c) => c.id === circleId);
+
     if (!circle) return;
 
     const modal = await this.modalCtrl.create({
@@ -195,8 +207,8 @@ export class MyCirclesComponent implements OnInit {
       componentProps: {
         isEdit: true,
         circleName: circle.name,
-        circleType: circle.type
-      }
+        circleType: circle.type,
+      },
     });
 
     await modal.present();
@@ -207,7 +219,7 @@ export class MyCirclesComponent implements OnInit {
       try {
         await this.circleRepo.update(circleId, {
           name: data.name,
-          type: data.type
+          type: data.type,
         });
       } catch (error) {
         console.log(error);
@@ -222,11 +234,11 @@ export class MyCirclesComponent implements OnInit {
     if (this.selectedCircles.size === 0) return;
     if (this.selectedCircles.size === 1) {
       await this.jsonService.generateJson(
-        this.selectedCircles.values().next().value!,
+        this.selectedCircles.values().next().value!
       );
     } else {
       await this.jsonService.generateMultipleCirclesJson(
-        Array.from(this.selectedCircles),
+        Array.from(this.selectedCircles)
       );
     }
   }
@@ -261,8 +273,9 @@ export class MyCirclesComponent implements OnInit {
               const allHomeworks: any[] = [];
 
               for (const circleId of this.selectedCircles) {
-                const students =
-                  await this.studentRepo.findByCircleId(circleId);
+                const students = await this.studentRepo.findByCircleId(
+                  circleId
+                );
                 allStudents.push(...students);
                 for (const st of students) {
                   if (st.id) {
@@ -285,12 +298,12 @@ export class MyCirclesComponent implements OnInit {
               if (this.selectedCircles.size === 1) {
                 await this.excelService.generateCircleExcel(
                   allStudents,
-                  filteredHomeworks,
+                  filteredHomeworks
                 );
               } else {
                 await this.excelService.generateMultipleCirclesExcel(
                   allStudents,
-                  filteredHomeworks,
+                  filteredHomeworks
                 );
               }
             }
@@ -304,6 +317,17 @@ export class MyCirclesComponent implements OnInit {
   ngOnInit() {
     this.fetchOwnerData();
     this.fetchCircles();
-    addIcons({ add, trash, shareSocial, documentText, close, pencil, people, 'albums-outline': albumsOutline, 'chevron-back': chevronBack, 'checkmark-circle': checkmarkCircle });
+    addIcons({
+      add,
+      trash,
+      shareSocial,
+      documentText,
+      close,
+      pencil,
+      people,
+      'albums-outline': albumsOutline,
+      'chevron-back': chevronBack,
+      'checkmark-circle': checkmarkCircle,
+    });
   }
 }

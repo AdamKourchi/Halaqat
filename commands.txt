@@ -4,4 +4,6 @@ adb kill-server
 adb start-server
 adb devices
 
-npx cap open android
+ionic build --prod
+ionic cap sync android
+ionic cap open android

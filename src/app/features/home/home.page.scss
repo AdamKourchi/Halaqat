@@ -9,3 +9,71 @@ ion-toolbar:last-child {
   --min-height: 44px;
   --padding-bottom: 4px;
 }
+
+// ─── Settings Popover Panel ───────────────────────────────────────────────────
+.settings-panel {
+  padding: 4px 0 8px;
+  min-width: 220px;
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px 8px;
+
+  .settings-icon {
+    font-size: 1.1rem;
+    color: var(--ion-color-primary);
+  }
+
+  .settings-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--ion-text-color);
+    font-family: 'Tajawal', sans-serif;
+  }
+}
+
+.settings-divider {
+  height: 1px;
+  background: var(--halaqat-divider);
+  margin: 0 12px 4px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  gap: 12px;
+  transition: background 0.15s ease;
+  border-radius: 8px;
+  margin: 0 4px;
+
+  &:hover {
+    background: rgba(var(--ion-color-primary-rgb), 0.07);
+  }
+
+  .settings-row-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 0.9rem;
+    color: var(--ion-text-color);
+
+    .row-icon {
+      font-size: 1.15rem;
+      color: var(--ion-color-primary);
+      transition: transform 0.2s ease;
+    }
+  }
+
+  ion-toggle {
+    --track-background: var(--halaqat-divider);
+    --track-background-checked: var(--ion-color-primary);
+    --handle-background: #fff;
+    padding: 0;
+  }
+}

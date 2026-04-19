@@ -7,13 +7,20 @@ import {
   IonLabel,
   IonSegment,
   IonSegmentButton,
+  IonPopover,
+  IonToggle,
 } from '@ionic/angular/standalone';
-import { TeacherRepository } from '@core';
+import { TeacherRepository, ThemeService } from '@core';
 import { MyCirclesComponent } from '../my-circles/my-circles.component';
 import { SharedCirclesComponent } from '../shared-circles/shared-circles.component';
 import { ModalController, IonButtons, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { documentTextOutline } from 'ionicons/icons';
+import {
+  documentTextOutline,
+  settingsOutline,
+  moonOutline,
+  sunnyOutline,
+} from 'ionicons/icons';
 import { GlobalExtractModalComponent } from './components/global-extract-modal/global-extract-modal.component';
 
 
@@ -34,18 +41,30 @@ import { GlobalExtractModalComponent } from './components/global-extract-modal/g
     IonButtons,
     IonButton,
     IonIcon,
+    IonPopover,
+    IonToggle,
   ],
 })
 export class HomePage implements OnInit {
   segmentValue: 'mine' | 'shared' = 'mine';
   teacherCount = 0;
+  isSettingsOpen = false;
 
-  private teacherRepo = inject(TeacherRepository)
+  themeService = inject(ThemeService);
+  private teacherRepo = inject(TeacherRepository);
   private cdr = inject(ChangeDetectorRef);
   private modalCtrl = inject(ModalController);
 
   segmentChanged(event: any) {
     this.segmentValue = event.detail.value;
+  }
+
+  openSettings(event: Event) {
+    this.isSettingsOpen = true;
+  }
+
+  toggleTheme() {
+    this.themeService.toggle();
   }
 
   async openGlobalExtractModal() {
@@ -56,7 +75,12 @@ export class HomePage implements OnInit {
   }
 
   async ngOnInit() {
-    addIcons({ 'document-text-outline': documentTextOutline });
+    addIcons({
+      'document-text-outline': documentTextOutline,
+      'settings-outline': settingsOutline,
+      'moon-outline': moonOutline,
+      'sunny-outline': sunnyOutline,
+    });
     this.teacherCount = await this.teacherRepo.count();
     this.cdr.detectChanges();
   }

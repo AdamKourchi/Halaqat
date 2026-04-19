@@ -18,8 +18,8 @@
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-/* Dark mode (system preference) */
-@import '@ionic/angular/css/palettes/dark.system.css';
+/* Dark mode — class-based (toggled by ThemeService, default: dark) */
+@import '@ionic/angular/css/palettes/dark.class.css';
 
 /* Custom theme tokens */
 @import 'theme/variables.scss';
@@ -202,3 +202,20 @@ ion-button {
   outline: 2px solid var(--ion-color-primary);
   outline-offset: -1px;
 }
+
+/* ─── Settings Popover ───────────────────────── */
+.settings-popover {
+  --backdrop-opacity: 0.15;
+  --background: var(--halaqat-surface);
+  --border-radius: 14px;
+  --box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.12);
+  --offset-y: 6px;
+
+  &::part(content) {
+    border-radius: 14px;
+    border: 1px solid var(--halaqat-divider);
+    min-width: 220px;
+    overflow: hidden;
+  }
+}
+

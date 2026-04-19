@@ -4,8 +4,11 @@
       <span class="app-brand">حَلَقات</span>
     </ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="openGlobalExtractModal()" fill="clear">
+      <ion-button (click)="openGlobalExtractModal()" fill="clear" id="extract-btn">
         <ion-icon slot="icon-only" name="document-text-outline"></ion-icon>
+      </ion-button>
+      <ion-button (click)="openSettings($event)" fill="clear" id="settings-btn">
+        <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -21,6 +24,45 @@
     </ion-segment>
   </ion-toolbar>
 </ion-header>
+
+<!-- Settings Popover -->
+<ion-popover
+  #settingsPopover
+  [isOpen]="isSettingsOpen"
+  (didDismiss)="isSettingsOpen = false"
+  [dismissOnSelect]="false"
+  side="bottom"
+  alignment="end"
+  class="settings-popover"
+>
+  <ng-template>
+    <div class="settings-panel">
+      <div class="settings-header">
+        <ion-icon name="settings-outline" class="settings-icon"></ion-icon>
+        <span class="settings-title">الإعدادات</span>
+      </div>
+
+      <div class="settings-divider"></div>
+
+      <!-- Dark / Light Mode Toggle -->
+      <div class="settings-row">
+        <div class="settings-row-label">
+          <ion-icon
+            [name]="themeService.isDark() ? 'moon-outline' : 'sunny-outline'"
+            class="row-icon"
+          ></ion-icon>
+          <span>{{ themeService.isDark() ? 'الوضع الليلي' : 'الوضع النهاري' }}</span>
+        </div>
+        <ion-toggle
+          [checked]="themeService.isDark()"
+          (ionChange)="toggleTheme()"
+          color="primary"
+          aria-label="تبديل الوضع الليلي"
+        ></ion-toggle>
+      </div>
+    </div>
+  </ng-template>
+</ion-popover>
 
 <ion-content fixed-slot-placement="before">
   @if (segmentValue === 'mine') {
