@@ -135,12 +135,16 @@
           <ion-list lines="none" class="grade-list">
             <ion-item class="grade-item">
               <ion-select
+              okText="تأكيد"
+              cancelText="إلغاء"
                 label="سورة البداية"
                 [(ngModel)]="newStartSurah"
                 (ionChange)="onStartSurahChange()"
                 placeholder="اختر السورة"
               >
-                <ion-select-option *ngFor="let s of surahs" [value]="s.id">{{ s.id }}. {{ s.name_arabic }}</ion-select-option>
+                @for (s of surahs; track $index) {
+                  <ion-select-option [value]="s.id">{{ s.id }}. {{ s.name_arabic }}</ion-select-option>
+                }
               </ion-select>
             </ion-item>
             <ion-item class="grade-item">
@@ -155,6 +159,8 @@
 
             <ion-item class="grade-item">
               <ion-select
+              okText="تأكيد"
+              cancelText="إلغاء"
                 label="سورة النهاية"
                 [(ngModel)]="newEndSurah"
                 placeholder="اختر السورة"
