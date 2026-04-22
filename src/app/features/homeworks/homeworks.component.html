@@ -38,9 +38,11 @@
               }
             </p>
           </ion-label>
+          @if (!isSharedCircle) {
           <ion-button fill="clear" color="danger" (click)="deleteHomework(hw)">
             <ion-icon name="trash"></ion-icon>
           </ion-button>
+          }
         </ion-item>
         }
       </ion-list>

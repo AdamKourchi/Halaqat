@@ -6,7 +6,11 @@ import {
   StudentRepository,
   HomeworkRepository,
   QuranRepository,
-  GradingMarksHelper
+  GradingMarksHelper,
+  Circle,
+  Teacher,
+  CircleRepository,
+  TeacherRepository,
 } from '@core';
 import { AlertController } from '@ionic/angular';
 import { ActivatedRoute } from '@angular/router';
@@ -60,14 +64,25 @@ export class HomeworksComponent implements OnInit {
 
   private studentRepo = inject(StudentRepository);
   private homeworkRepo = inject(HomeworkRepository);
+  private circleRepo = inject(CircleRepository);
+  private teacherRepo = inject(TeacherRepository);
   private alertCtrl = inject(AlertController);
   private route = inject(ActivatedRoute);
   private quranRepo = inject(QuranRepository);
 
   studentId: string | null = null;
-  surahs : string[] = [];
+  surahs: string[] = [];
   circleId: string | undefined;
+  circle: Circle | null = null;
+  teacher: Teacher | null = null;
+  user: Teacher | null = null;
   gradingMarksHelper = inject(GradingMarksHelper);
+
+  get isSharedCircle(): boolean {
+    console.log(this.circle?.teacher_id, this.user?.id);
+    
+    return this.circle?.teacher_id !== this.user?.id;
+  }
 
   async loadData() {
     if (this.studentId) {
@@ -75,15 +90,22 @@ export class HomeworksComponent implements OnInit {
       this.homeworks = await this.homeworkRepo.findByStudentId(this.studentId);
       this.circleId = this.student?.circle_id;
     }
+    if (this.circleId) {
+      this.circle = await this.circleRepo.findById(this.circleId);
+      this.teacher = await this.teacherRepo.findById(
+        this.circle?.teacher_id || ''
+      );
+      this.user = await this.teacherRepo.findOwner();
+    }
   }
 
-   getSurahName(id: number) {
-    return this.surahs[id-1];
+  getSurahName(id: number) {
+    return this.surahs[id - 1];
   }
 
-  async loadSurahsNames(){
+  async loadSurahsNames() {
     const surahs = await this.quranRepo.getAllSurahs();
-    this.surahs = surahs.map(s => s.name_arabic);
+    this.surahs = surahs.map((s) => s.name_arabic);
   }
 
   async deleteHomework(hw: Homework) {

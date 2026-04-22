@@ -1,15 +1,33 @@
 @if (selectionMode) {
   <div class="selection-bar">
     <div class="rtl-row" style="gap: 4px;">
-      <ion-button fill="clear" color="danger" (click)="deleteSelected()">
-        <ion-icon name="trash" slot="icon-only"></ion-icon>
-      </ion-button>
-      <ion-button fill="clear" color="primary" (click)="shareSelected()">
-        <ion-icon name="share-social" slot="icon-only"></ion-icon>
-      </ion-button>
-      <ion-button fill="clear" color="secondary" (click)="extractSummary()">
-        <ion-icon name="document-text" slot="icon-only"></ion-icon>
-      </ion-button>
+    <ion-button
+      fill="solid"
+      color="danger"
+      size="small"
+      (click)="deleteSelected()"
+    >
+      <ion-icon name="trash" slot="start"></ion-icon>
+      حذف
+    </ion-button>
+    <ion-button
+      fill="solid"
+      color="primary"
+      size="small"
+      (click)="shareSelected()"
+    >
+      <ion-icon name="share-social" slot="start"></ion-icon>
+      مشاركة
+    </ion-button>
+    <ion-button
+      fill="solid"
+      color="success"
+      size="small"
+      (click)="extractSummary()"
+    >
+      <ion-icon name="document-text" slot="start"></ion-icon>
+      تقرير
+    </ion-button>
     </div>
     <ion-button fill="clear" color="medium" (click)="cancelSelection()">
       <ion-icon name="close" slot="icon-only"></ion-icon>

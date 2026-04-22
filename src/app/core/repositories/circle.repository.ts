@@ -135,6 +135,8 @@ export class CircleRepository extends BaseRepository {
     if (exists) {
       await this.update(circle.id, circle);
     } else {
+      console.log("CREATED",circle);
+      
       await this.run(
         `INSERT INTO circles (id, teacher_id, name, type, creation_date)
          VALUES (?, ?, ?, ?, ?)`,

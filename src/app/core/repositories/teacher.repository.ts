@@ -75,11 +75,15 @@ export class TeacherRepository extends BaseRepository {
   async upsert(teacher: Teacher): Promise<void> {
 
     const existing = await this.findById(teacher.id);
+
     if (existing) {
       existing.is_owner ? teacher.is_owner = true : teacher.is_owner = false;
       await this.update(teacher.id, teacher);
+      console.log("Teacher Updated", teacher);
     } else {
-      await this.create(teacher.id, teacher.name, teacher.contact_info, teacher.is_owner);
+      await this.create(teacher.id, teacher.name, teacher.contact_info, false);
+      console.log("Teacher Created", teacher);
+      
     }
   }
 }

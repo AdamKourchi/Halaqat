@@ -53,7 +53,7 @@ export class JsonService {
       const jsonStr = await this.circleRepo.extractToJSON(circleId);
       dataArray.push(JSON.parse(jsonStr));
     }
-    const fileName = `circles.json`;
+    const fileName = `حلقات.json`;
 
     const savedFile = await Filesystem.writeFile({
       path: fileName,
@@ -71,7 +71,7 @@ export class JsonService {
   async importCircleData(data: any) {
     console.log("data ",data);
     
-    if (data.teacher) {
+    if (data.teacher) {      
       await this.teacherRepo.upsert(data.teacher);
     }
     if (data.circle) {

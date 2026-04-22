@@ -207,9 +207,7 @@ export class SharedCirclesComponent implements OnInit {
           circlesData = [data];
         }
 
-        for (const circleData of circlesData) {
-          console.log("circleData ",circleData);
-          
+        for (const circleData of circlesData) {          
           await this.jsonService.importCircleData(circleData);
         }
         await this.fetchSharedCircles();

@@ -18,7 +18,7 @@ import { App } from '@capacitor/app';
 export class AppComponent {
   isReady = false;
 
-  // 👉 1. ADD THIS: A promise to block execution until the DB is ready
+  //A promise to block execution until the DB is ready
   private appInitializedPromise: Promise<void>;
   private resolveAppInitialized!: () => void;
 
@@ -32,7 +32,6 @@ export class AppComponent {
   private themeService = inject(ThemeService);
 
   constructor() {
-    // 👉 2. INITIALIZE THE PROMISE
     this.appInitializedPromise = new Promise((resolve) => {
       this.resolveAppInitialized = resolve;
     });
@@ -61,7 +60,7 @@ export class AppComponent {
         await this.router.navigate(['/register'], { replaceUrl: true });
       }
 
-      // 👉 3. RESOLVE THE PROMISE HERE: The DB is now officially open!
+      // RESOLVE THE PROMISE HERE: The DB is now officially open!
       this.resolveAppInitialized();
 
       // Now check for Share intents
@@ -80,7 +79,6 @@ export class AppComponent {
   }
 
   async processImportedFile(rawUrl: string) {
-    // 👉 4. ADD THIS: Wait here until resolveAppInitialized() is called!
     await this.appInitializedPromise;
 
     try {
