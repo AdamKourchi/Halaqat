@@ -4,7 +4,7 @@
 
 تطبيق متكامل لإدارة حلقات تحفيظ القرآن الكريم، مبني بتقنية **Ionic + Angular + Capacitor** للعمل على أجهزة **Android**.
 
-<iframe width="100%" height="450" src="https://www.youtube.com/embed/4uMF2-OoM0s" title="Halaqat App Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border-radius: 12px;"></iframe>
+[![Halaqat App Demo](https://img.youtube.com/vi/4uMF2-OoM0s/hqdefault.jpg)](https://www.youtube.com/watch?v=4uMF2-OoM0s)
 
 
 ---
