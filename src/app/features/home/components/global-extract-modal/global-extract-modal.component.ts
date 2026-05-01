@@ -15,6 +15,8 @@ import {
   IonItem,
   IonCheckbox,
   IonInput,
+  IonSegment,
+  IonSegmentButton,
   ModalController,
   AlertController,
 } from '@ionic/angular/standalone';
@@ -25,6 +27,7 @@ import {
   StudentRepository,
   HomeworkRepository,
   ExcelService,
+  ExcelDisplayMode,
   Circle,
   TeacherRepository,
   Teacher,
@@ -50,6 +53,8 @@ import {
     IonItem,
     IonCheckbox,
     IonInput,
+    IonSegment,
+    IonSegmentButton,
   ],
 })
 export class GlobalExtractModalComponent implements OnInit {
@@ -66,6 +71,9 @@ export class GlobalExtractModalComponent implements OnInit {
   teachers: Teacher[] = [];
 
   selectedCircleIds = new Set<string>();
+
+  /** How homework ranges appear in the exported file */
+  displayMode: ExcelDisplayMode = 'ayah';
 
   startDate: string = new Date(new Date().setMonth(new Date().getMonth() - 1))
     .toISOString()
@@ -154,12 +162,14 @@ export class GlobalExtractModalComponent implements OnInit {
     if (this.selectedCircleIds.size === 1) {
       await this.excelService.generateCircleExcel(
         allStudents,
-        filteredHomeworks
+        filteredHomeworks,
+        this.displayMode,
       );
     } else {
       await this.excelService.generateMultipleCirclesExcel(
         allStudents,
-        filteredHomeworks
+        filteredHomeworks,
+        this.displayMode,
       );
     }
 

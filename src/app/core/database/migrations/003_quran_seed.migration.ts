@@ -31,6 +31,7 @@ export const migration003: Migration = {
     // and processes in a single transaction in native SQLite, as opposed to
     // making thousands of bridge calls which causes the app to hang.
     await db.execute(sqlText);
+
   },
 
   async down(db: SQLiteDBConnection): Promise<void> {

@@ -1,60 +1,15 @@
-@if (selectionMode) {
-<div class="selection-bar">
-  <div class="rtl-row" style="gap: 4px">
-    <ion-button
-      fill="solid"
-      color="danger"
-      size="small"
-      (click)="deleteSelected()"
-    >
-      <ion-icon name="trash" slot="start"></ion-icon>
-      حذف
-    </ion-button>
-    <ion-button
-      fill="solid"
-      color="primary"
-      size="small"
-      (click)="shareSelected()"
-    >
-      <ion-icon name="share-social" slot="start"></ion-icon>
-      مشاركة
-    </ion-button>
-    <ion-button
-      fill="solid"
-      color="success"
-      size="small"
-      (click)="extractSummary()"
-    >
-      <ion-icon name="document-text" slot="start"></ion-icon>
-      تقرير
-    </ion-button>
-    @if (selectedCircles.size === 1) {
-    <ion-button
-      size="small"
-      fill="solid"
-      color="primary"
-      (click)="editSelected()"
-    >
-      <ion-icon name="pencil" slot="start"></ion-icon>
-      تعديل
-    </ion-button>
-    }
-  </div>
-  <ion-button fill="clear" color="medium" (click)="cancelSelection()">
-    <ion-icon name="close" slot="icon-only"></ion-icon>
-  </ion-button>
-</div>
-} @else {
 <div class="greeting-bar">
   <p class="greeting-text">
-    السَّلَامُ عَلَيْكُمْ، <span class="greeting-name">{{ owner?.name }}</span>
+    السَّلَامُ عَلَيْكُمْ،
+    <span class="greeting-name">{{ owner?.name }}</span>
   </p>
   <ion-button fill="solid" size="small" (click)="openCreateCircleModal()">
     <ion-icon name="add" slot="start"></ion-icon>
     إنشاء حلقة
   </ion-button>
 </div>
-} @for (circle of circles; track circle.id) {
+
+@for (circle of circles; track circle.id) {
 <ion-card
   button="true"
   (touchstart)="startPress(circle)"
@@ -69,8 +24,8 @@
   <ion-card-content>
     <div class="circle-card-inner">
       <!-- Avatar / Icon -->
-      <div class="avatar-circle circle-avatar">
-        {{ circle.name.charAt(0) }}
+      <div class="avatar-circle circle-avatar" [style.background]="getAvatarColor(circle.name)">
+        <ion-icon name="book" style="color: white; font-size: 24px;"></ion-icon>
       </div>
 
       <!-- Info -->

@@ -4,9 +4,16 @@
   gap: 14px;
 }
 
-.circle-avatar {
-  font-size: 1.3rem;
+.avatar-circle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px;       /* Ensure the parent has a size */
+  height: 50px;      /* Ensure the parent has a size */
+  border-radius: 50%; /* Optional: keeps it looking like an avatar */
 }
+
+
 
 .circle-info {
   flex: 1;

@@ -20,7 +20,7 @@ export class HomeworkRepository extends BaseRepository {
   /** All homeworks for a single student, newest first. */
   async findByStudentId(studentId: string): Promise<Homework[]> {
     return this.query<Homework>(
-      'SELECT * FROM homeworks WHERE student_id = ? ORDER BY date_assigned DESC',
+      'SELECT * FROM homeworks WHERE student_id = ? ORDER BY graded_date DESC',
       [studentId]
     );
   }
@@ -60,8 +60,8 @@ export class HomeworkRepository extends BaseRepository {
       `INSERT INTO homeworks
          (id, student_id, circle_id, date_assigned,
           start_surah, start_ayah, end_surah, end_ayah,
-          mistakes_count, grade_mark, remark, graded_date)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          mistakes_count, grade_mark, remark, graded_date, is_pre_memorized)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
         hw.student_id,
@@ -75,6 +75,7 @@ export class HomeworkRepository extends BaseRepository {
         hw.grade_mark ?? null,
         hw.remark ?? null,
         null,
+        hw.is_pre_memorized ?? 0,
       ]
     );
     return id;
@@ -116,8 +117,8 @@ export class HomeworkRepository extends BaseRepository {
         `INSERT INTO homeworks
            (id, student_id, circle_id, date_assigned,
             start_surah, start_ayah, end_surah, end_ayah,
-            mistakes_count, grade_mark, remark, graded_date)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            mistakes_count, grade_mark, remark, graded_date, is_pre_memorized)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           hw.id,
           hw.student_id,
@@ -131,6 +132,7 @@ export class HomeworkRepository extends BaseRepository {
           hw.grade_mark ?? null,
           hw.remark ?? null,
           hw.graded_date ?? null,
+          hw.is_pre_memorized ?? 0,
         ]
       );
     }

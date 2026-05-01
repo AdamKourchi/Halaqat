@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-title>إضافة طالب</ion-title>
     <ion-buttons slot="end">
-      <ion-button  (click)="cancel()">إلغاء</ion-button>
+      <ion-button (click)="cancel()">إلغاء</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -17,7 +17,7 @@
   </ion-item>
 
   <ion-item>
-    <ion-select label="الجنس :"  [(ngModel)]="studentGender">
+    <ion-select label="الجنس :" [(ngModel)]="studentGender" cancelText="إلغاء" okText="تأكيد">
       <ion-select-option value="Male">ذكر</ion-select-option>
       <ion-select-option value="Female">أنثى</ion-select-option>
     </ion-select>
@@ -30,19 +30,35 @@
       type="text"
     ></ion-input>
   </ion-item>
-  
+
   <ion-item>
     <ion-input
       label="رقم التواصل :"
       [(ngModel)]="parentContact"
       type="text"
+      dir="ltr"
+    ></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-input
+      label="مشاكل صحية :"
+      [(ngModel)]="medicalIssues"
+      type="text"
     ></ion-input>
   </ion-item>
 
   <ion-toolbar>
-  <ion-button expand="block" (click)="confirm()" [disabled]="!studentName">
-    إنشاء
-  </ion-button>
-</ion-toolbar>
-
+    <ion-button expand="block" fill="outline" color="tertiary" (click)="openOnboardingModal()">
+      <ion-icon name="book" slot="start"></ion-icon>
+      حفظ سابق
+      @if (preMemorizedThumuns.length > 0) {
+        <ion-badge slot="end" color="success">{{ preMemorizedThumuns.length }}</ion-badge>
+      }
+    </ion-button>
+    <ion-button expand="block" (click)="confirm()" [disabled]="!studentName">
+      إنشاء
+    </ion-button>
+  </ion-toolbar>
 </ion-content>
+

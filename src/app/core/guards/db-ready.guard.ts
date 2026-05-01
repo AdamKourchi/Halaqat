@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
-import { DatabaseService } from '../core/database/database.service';
+import { DatabaseService } from '../database/database.service';
 
 /**
  * DbReadyGuard

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, Input } from '@angular/core';
+import { Component, inject, OnInit, Input, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -10,6 +10,7 @@ import {
   documentTextOutline,
   createOutline,
   closeOutline,
+  bookOutline,
 } from 'ionicons/icons';
 import {
   IonHeader,
@@ -29,18 +30,19 @@ import {
   IonCardContent,
   AlertController,
   ToastController,
-  IonFooter, ModalController } from '@ionic/angular/standalone';
-import {
-  StudentRepository,
-  Student,
-} from '@core';
+  IonFooter,
+  ModalController,
+} from '@ionic/angular/standalone';
+import { StudentRepository, Student } from '@core';
+import { MushafVisualizerComponent } from './components/mushaf-visualizer/mushaf-visualizer.component';
 
 @Component({
   selector: 'app-student-profile',
   templateUrl: './student-profile.component.html',
   styleUrls: ['./student-profile.component.scss'],
   standalone: true,
-  imports: [IonFooter, 
+  imports: [
+    IonFooter,
     CommonModule,
     FormsModule,
     IonHeader,
@@ -58,20 +60,24 @@ import {
     IonCardHeader,
     IonCardTitle,
     IonCardContent,
-
+    MushafVisualizerComponent,
   ],
 })
 export class StudentProfileComponent implements OnInit {
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
+  private route      = inject(ActivatedRoute);
+  private router     = inject(Router);
   private studentRepo = inject(StudentRepository);
-  private alertCtrl = inject(AlertController);
-  private toastCtrl = inject(ToastController);
-  private modalCtrl = inject(ModalController);
+  private alertCtrl  = inject(AlertController);
+  private toastCtrl  = inject(ToastController);
+  private modalCtrl  = inject(ModalController);
 
   @Input() studentId?: string;
   @Input() isModal: boolean = false;
-  
+
+  /** Used to refresh the visualizer after onboarding. */
+  @ViewChild(MushafVisualizerComponent)
+  visualizer?: MushafVisualizerComponent;
+
   student: Student | null = null;
 
   // Date range for Excel export
@@ -82,12 +88,13 @@ export class StudentProfileComponent implements OnInit {
 
   ngOnInit() {
     addIcons({
-      'arrow-back': arrowBackOutline,
-      save: saveOutline,
-      trash: trashOutline,
+      'arrow-back':    arrowBackOutline,
+      save:            saveOutline,
+      trash:           trashOutline,
       'document-text': documentTextOutline,
-      create: createOutline,
-      close: closeOutline,
+      create:          createOutline,
+      close:           closeOutline,
+      book:            bookOutline,
     });
     if (!this.studentId) {
       this.studentId = this.route.snapshot.paramMap.get('id') as string;
@@ -100,19 +107,21 @@ export class StudentProfileComponent implements OnInit {
       this.student = await this.studentRepo.findById(this.studentId);
     }
   }
+
   async saveStudent() {
     if (!this.student || !this.student.id) return;
     try {
       await this.studentRepo.update(this.student.id, {
-        name: this.student.name,
-        gender: this.student.gender,
-        parent_name: this.student.parent_name,
+        name:           this.student.name,
+        gender:         this.student.gender,
+        parent_name:    this.student.parent_name,
         parent_contact: this.student.parent_contact,
+        medical_issues: this.student.medical_issues,
       });
       const toast = await this.toastCtrl.create({
-        message: 'تم حفظ بيانات الطالب',
+        message:  'تم حفظ بيانات الطالب',
         duration: 2000,
-        color: 'success',
+        color:    'success',
       });
       toast.present();
     } catch (e) {
@@ -122,13 +131,13 @@ export class StudentProfileComponent implements OnInit {
 
   async confirmDeleteStudent() {
     const alert = await this.alertCtrl.create({
-      header: 'تأكيد الحذف',
+      header:  'تأكيد الحذف',
       message: 'هل أنت متأكد من حذف هذا الطالب وجميع واجباته؟',
       buttons: [
         { text: 'إلغاء', role: 'cancel' },
         {
-          text: 'حذف',
-          role: 'destructive',
+          text:    'حذف',
+          role:    'destructive',
           handler: () => this.deleteStudent(),
         },
       ],
@@ -141,14 +150,16 @@ export class StudentProfileComponent implements OnInit {
     try {
       await this.studentRepo.delete(this.student.id);
       if (this.isModal) {
-         this.modalCtrl.dismiss({ deleted: true });
+        this.modalCtrl.dismiss({ deleted: true });
       } else {
-         this.router.navigate(['/circle-details', this.student.circle_id]);
+        this.router.navigate(['/circle-details', this.student.circle_id]);
       }
     } catch (e) {
       console.error(e);
     }
   }
+
+
 
   back() {
     if (this.isModal) {

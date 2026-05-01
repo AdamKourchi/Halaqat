@@ -41,7 +41,8 @@ export const migration002: Migration = {
         gender          TEXT    NOT NULL,
         enlistment_date TEXT    NOT NULL DEFAULT (date('now')),
         parent_name     TEXT,
-        parent_contact  TEXT
+        parent_contact  TEXT,
+        medical_issues  TEXT 
       );
     `);
 
@@ -59,33 +60,20 @@ export const migration002: Migration = {
         mistakes_count INTEGER NOT NULL DEFAULT 0,
         grade_mark     TEXT,
         remark         TEXT,
-        graded_date    TEXT
+        graded_date    TEXT,
+        is_pre_memorized BOOLEAN NOT NULL DEFAULT 0
       );
     `);
 
-    // ── student_mushaf_progress ────────────────────────────────────────────
-    await db.execute(`
-      CREATE TABLE IF NOT EXISTS student_mushaf_progress (
-        id                  TEXT PRIMARY KEY,
-        student_id          TEXT NOT NULL REFERENCES students(id) ON DELETE CASCADE,
-        surah_number        INTEGER NOT NULL CHECK (surah_number BETWEEN 1 AND 114),
-        memorized_percentage REAL    NOT NULL DEFAULT 0.0,
-        average_score       REAL    NOT NULL DEFAULT 0.0,
-        last_reviewed_date  TEXT,
-        UNIQUE(student_id, surah_number)
-      );
-    `);
 
     // ── indexes for common look-ups ────────────────────────────────────────
     await db.execute(`CREATE INDEX IF NOT EXISTS idx_circles_teacher   ON circles(teacher_id);`);
     await db.execute(`CREATE INDEX IF NOT EXISTS idx_students_circle   ON students(circle_id);`);
     await db.execute(`CREATE INDEX IF NOT EXISTS idx_homeworks_student ON homeworks(student_id);`);
     await db.execute(`CREATE INDEX IF NOT EXISTS idx_homeworks_circle  ON homeworks(circle_id);`);
-    await db.execute(`CREATE INDEX IF NOT EXISTS idx_progress_student  ON student_mushaf_progress(student_id);`);
   },
 
   async down(db: SQLiteDBConnection): Promise<void> {
-    await db.execute(`DROP TABLE IF EXISTS student_mushaf_progress;`);
     await db.execute(`DROP TABLE IF EXISTS homeworks;`);
     await db.execute(`DROP TABLE IF EXISTS students;`);
     await db.execute(`DROP TABLE IF EXISTS circles;`);

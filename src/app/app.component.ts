@@ -41,6 +41,22 @@ export class AppComponent {
     window.addEventListener("sendIntentReceived", () => {
       this.checkIncomingIntents();
     });
+    
+    // Expose database seeder to the window object for developer use
+    (window as any).seedDatabase = async () => {
+      try {
+        console.log('🌱 Starting seed process from dev tools...');
+        await this.dbService.seedDatabase();
+        console.log('✅ Seed successful! Please refresh or navigate to see changes.');
+        // Refresh UI
+        const currentUrl = this.router.url;
+        this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+          this.router.navigate([currentUrl]);
+        });
+      } catch (err) {
+        console.error('❌ Failed to seed database:', err);
+      }
+    };
 
     App.addListener('appUrlOpen', (data: any) => {
       if (data.url) {

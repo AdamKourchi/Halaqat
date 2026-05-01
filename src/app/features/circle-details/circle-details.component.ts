@@ -9,6 +9,7 @@ import {
   HomeworkRepository,
   ExcelService,
   TeacherRepository,
+  MushafProgressService,
 } from '@core';
 import {
   IonHeader,
@@ -24,6 +25,9 @@ import {
   IonBadge,
   IonSegment,
   IonSegmentButton,
+  IonFooter,
+  IonTabBar,
+  IonTabButton
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -40,6 +44,7 @@ import {
   chevronBack,
   checkmarkCircle,
   bookOutline,
+  accessibilityOutline
 } from 'ionicons/icons';
 import { CreateStudentComponent } from './components/create-student/create-student.component';
 import { StudentHomeworkComponent } from './components/student-homework/student-homework.component';
@@ -59,6 +64,9 @@ import { StudentProfileComponent } from '../student-profile/student-profile.comp
     IonContent,
     IonSegment,
     IonSegmentButton,
+    IonFooter,
+    IonTabBar,
+    IonTabButton
   ],
   selector: 'app-circle-details',
   templateUrl: './circle-details.component.html',
@@ -75,6 +83,7 @@ export class CircleDetailsComponent implements OnInit {
   private excelService = inject(ExcelService);
   private modalCtrl = inject(ModalController);
   private alertCtrl = inject(AlertController);
+  private mushafProgressSvc = inject(MushafProgressService);
 
   circleId = this.route.snapshot.paramMap.get('id') as string;
   circle: Circle | null = null;
@@ -141,13 +150,23 @@ export class CircleDetailsComponent implements OnInit {
     if (role === 'confirm') {
       try {
         if (this.circle && this.circle.id !== undefined) {
-          await this.studentRepo.create(
+          const newStudentId = await this.studentRepo.create(
             this.circle.id,
             data.name,
             data.gender,
             data.parent_name,
-            data.parent_contact
+            data.parent_contact,
+            data.medical_issues
           );
+
+          // If teacher selected pre-memorized Thumuns during creation, persist them now
+          if (data.pre_memorized_thumuns?.length && newStudentId) {
+            await this.mushafProgressSvc.onboardPreMemorized(
+              newStudentId,
+              this.circle.id,
+              data.pre_memorized_thumuns
+            );
+          }
         }
       } catch (error) {
         console.log(error);
@@ -288,39 +307,46 @@ export class CircleDetailsComponent implements OnInit {
       buttons: [
         { text: 'إلغاء', role: 'cancel' },
         {
-          text: 'إنشاء التقرير',
-          handler: async (data) => {
-            if (data.startDate && data.endDate) {
-              const studentsList = this.students.filter(
-                (s) => s.id && this.selectedStudents.has(s.id)
-              );
-              const allHomeworks: any[] = [];
-              for (const student of studentsList) {
-                const hws = await this.homeworkRepo.findByStudentId(
-                  student.id!
-                );
-                allHomeworks.push(...hws);
-              }
-              const start = new Date(data.startDate).getTime();
-              const endObj = new Date(data.endDate);
-              endObj.setHours(23, 59, 59, 999);
-              const end = endObj.getTime();
-
-              const filteredHomeworks = allHomeworks.filter((h) => {
-                const d = new Date(h.date_assigned!).getTime();
-                return d >= start && d <= end;
-              });
-
-              await this.excelService.generateCircleExcel(
-                studentsList,
-                filteredHomeworks
-              );
-            }
-          },
+          text: 'تصدير بصيغة الآيات',
+          handler: async (data) => this.generateExcelReport(data, 'ayah'),
+        },
+        {
+          text: 'تصدير بصيغة الأثمان',
+          handler: async (data) => this.generateExcelReport(data, 'hizb'),
         },
       ],
     });
     await alert.present();
+  }
+
+  private async generateExcelReport(data: any, displayMode: 'ayah' | 'hizb') {
+    if (data.startDate && data.endDate) {
+      const studentsList = this.students.filter(
+        (s) => s.id && this.selectedStudents.has(s.id)
+      );
+      const allHomeworks: any[] = [];
+      for (const student of studentsList) {
+        const hws = await this.homeworkRepo.findByStudentId(
+          student.id!
+        );
+        allHomeworks.push(...hws);
+      }
+      const start = new Date(data.startDate).getTime();
+      const endObj = new Date(data.endDate);
+      endObj.setHours(23, 59, 59, 999);
+      const end = endObj.getTime();
+
+      const filteredHomeworks = allHomeworks.filter((h) => {
+        const d = new Date(h.date_assigned!).getTime();
+        return d >= start && d <= end;
+      });
+
+      await this.excelService.generateCircleExcel(
+        studentsList,
+        filteredHomeworks,
+        displayMode
+      );
+    }
   }
   openHomeworks() {
     if (this.selectedStudents.size !== 1) return;
@@ -348,6 +374,7 @@ export class CircleDetailsComponent implements OnInit {
       'chevron-back': chevronBack,
       'checkmark-circle': checkmarkCircle,
       'book-outline': bookOutline,
+      'accessibility-outline': accessibilityOutline,
     });
     this.cancelSelection();
     await this.fetchCircle();

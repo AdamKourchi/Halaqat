@@ -13,7 +13,8 @@
 
 <ion-content class="ion-padding">
   @if (student) {
-    <!-- Student Data Form -->
+
+    <!-- ── Student Data Card ─────────────────────────────────────── -->
     <ion-card>
       <ion-card-header>
         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -42,16 +43,30 @@
         </ion-item>
         <ion-item>
           <ion-label position="stacked">رقم ولي الأمر</ion-label>
-          <ion-input [(ngModel)]="student.parent_contact" placeholder="رقم الهاتف"></ion-input>
+          <ion-input dir="ltr" [(ngModel)]="student.parent_contact" placeholder="رقم الهاتف"></ion-input>
         </ion-item>
-        <div class="ion-margin-top ion-text-start" style="display: flex; justify-content: center;">
-          <ion-button (click)="saveStudent()" >
+        <ion-item>
+          <ion-label position="stacked">مشاكل صحية</ion-label>
+          <ion-input
+            [(ngModel)]="student.medical_issues"
+            auto-grow
+          ></ion-input>
+        </ion-item>
+
+        <!-- Save + Onboarding buttons side-by-side -->
+        <div class="action-row" style="display:flex; gap:8px; margin-top:14px; justify-content:center;">
+          <ion-button (click)="saveStudent()" fill="solid">
             <ion-icon name="save" slot="start"></ion-icon>
-            حفظ البيانات
+            حفظ
           </ion-button>
         </div>
       </ion-card-content>
     </ion-card>
+
+    <!-- ── Mushaf Progress Visualizer ───────────────────────────── -->
+    <div class="visualizer-section" style="margin-top: 8px;">
+      <app-mushaf-visualizer [studentId]="student.id!"></app-mushaf-visualizer>
+    </div>
 
   } @else {
     <div class="ion-text-center ion-padding">
@@ -59,7 +74,6 @@
     </div>
   }
 
-
 </ion-content>
-  <ion-footer style="height: 50px;">
-  </ion-footer>
+<ion-footer style="height: 50px;">
+</ion-footer>

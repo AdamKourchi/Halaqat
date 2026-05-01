@@ -68,6 +68,18 @@
     <p class="ion-text-center ion-padding">لا توجد حلقات لعرضها.</p>
   }
 
+  <div style="margin-top: 20px;">
+    <p style="font-size: 0.85rem; font-weight: 700; color: var(--ion-color-medium); margin-bottom: 8px;">طريقة عرض الحصة في الملف:</p>
+    <ion-segment [(ngModel)]="displayMode" style="border-radius: 10px;">
+      <ion-segment-button value="ayah">
+        <ion-label>سورة / آية</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="hizb">
+        <ion-label>حزب / ثُمن</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
   <ion-button expand="block" class="ion-margin-top" color="success" (click)="generateReport()">
     <ion-icon name="document-text" slot="start"></ion-icon>
     إنشاء تقرير Excel

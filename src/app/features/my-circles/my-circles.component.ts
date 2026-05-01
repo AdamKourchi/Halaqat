@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, Output, EventEmitter } from '@angular/core';
 import {
   IonIcon,
   IonCard,
@@ -19,6 +19,7 @@ import {
   albumsOutline,
   chevronBack,
   checkmarkCircle,
+  book,
 } from 'ionicons/icons';
 import {
   CircleRepository,
@@ -58,6 +59,67 @@ export class MyCirclesComponent implements OnInit {
   selectedCircles: Set<string> = new Set();
   private pressTimer: any;
   private longPressActive = false;
+
+  private stringToHash(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return hash;
+  }
+
+  getAvatarColor(name: string): string {
+    const hash = this.stringToHash(name);
+    // Base hue (0-360)
+    const h1 = Math.abs(hash) % 360; 
+
+    // We use HSL to ensure the colors are bright and vibrant
+    return `hsl(${h1}, 75%, 55%)`;
+  }
+
+
+  // 1. ADD THIS OUTPUT
+  @Output() selectionState = new EventEmitter<{
+    isActive: boolean;
+    count: number;
+  }>();
+
+  // 2. ADD THIS HELPER METHOD
+  private emitSelectionState() {
+    this.selectionState.emit({
+      isActive: this.selectionMode,
+      count: this.selectedCircles.size,
+    });
+  }
+
+  // 3. UPDATE THESE THREE METHODS to call the helper
+  enableSelectionMode(circle: Circle) {
+    if (!circle.id) return;
+    this.selectionMode = true;
+    if (!this.selectedCircles.has(circle.id)) {
+      this.selectedCircles.add(circle.id);
+    }
+    this.emitSelectionState(); // <-- Added
+  }
+
+  toggleSelection(circle: Circle) {
+    if (!circle.id) return;
+    if (this.selectedCircles.has(circle.id)) {
+      this.selectedCircles.delete(circle.id);
+      if (this.selectedCircles.size === 0) {
+        this.selectionMode = false;
+      }
+    } else {
+      this.selectedCircles.add(circle.id);
+    }
+    this.emitSelectionState(); // <-- Added
+  }
+
+  cancelSelection() {
+    this.selectionMode = false;
+    this.selectedCircles.clear();
+    this.emitSelectionState(); // <-- Added
+  }
 
   async fetchCircles() {
     try {
@@ -127,26 +189,6 @@ export class MyCirclesComponent implements OnInit {
     clearTimeout(this.pressTimer);
   }
 
-  enableSelectionMode(circle: Circle) {
-    if (!circle.id) return;
-    this.selectionMode = true;
-    if (!this.selectedCircles.has(circle.id)) {
-      this.selectedCircles.add(circle.id);
-    }
-  }
-
-  toggleSelection(circle: Circle) {
-    if (!circle.id) return;
-    if (this.selectedCircles.has(circle.id)) {
-      this.selectedCircles.delete(circle.id);
-      if (this.selectedCircles.size === 0) {
-        this.selectionMode = false;
-      }
-    } else {
-      this.selectedCircles.add(circle.id);
-    }
-  }
-
   onCardClick(circle: Circle) {
     if (this.longPressActive) {
       return;
@@ -156,11 +198,6 @@ export class MyCirclesComponent implements OnInit {
     } else {
       this.router.navigate(['/circle-details', circle.id]);
     }
-  }
-
-  cancelSelection() {
-    this.selectionMode = false;
-    this.selectedCircles.clear();
   }
 
   async deleteSelected() {
@@ -266,52 +303,58 @@ export class MyCirclesComponent implements OnInit {
       buttons: [
         { text: 'إلغاء', role: 'cancel' },
         {
-          text: 'إنشاء التقرير',
-          handler: async (data) => {
-            if (data.startDate && data.endDate) {
-              const allStudents: any[] = [];
-              const allHomeworks: any[] = [];
-
-              for (const circleId of this.selectedCircles) {
-                const students = await this.studentRepo.findByCircleId(
-                  circleId
-                );
-                allStudents.push(...students);
-                for (const st of students) {
-                  if (st.id) {
-                    const hws = await this.homeworkRepo.findByStudentId(st.id);
-                    allHomeworks.push(...hws);
-                  }
-                }
-              }
-
-              const start = new Date(data.startDate).getTime();
-              const endObj = new Date(data.endDate);
-              endObj.setHours(23, 59, 59, 999);
-              const end = endObj.getTime();
-
-              const filteredHomeworks = allHomeworks.filter((h) => {
-                const d = new Date(h.date_assigned!).getTime();
-                return d >= start && d <= end;
-              });
-
-              if (this.selectedCircles.size === 1) {
-                await this.excelService.generateCircleExcel(
-                  allStudents,
-                  filteredHomeworks
-                );
-              } else {
-                await this.excelService.generateMultipleCirclesExcel(
-                  allStudents,
-                  filteredHomeworks
-                );
-              }
-            }
-          },
+          text: 'تصدير بصيغة الآيات',
+          handler: async (data) => this.generateExcelReport(data, 'ayah'),
+        },
+        {
+          text: 'تصدير بصيغة الأثمان',
+          handler: async (data) => this.generateExcelReport(data, 'hizb'),
         },
       ],
     });
     await alert.present();
+  }
+
+  private async generateExcelReport(data: any, displayMode: 'ayah' | 'hizb') {
+    if (data.startDate && data.endDate) {
+      const allStudents: any[] = [];
+      const allHomeworks: any[] = [];
+
+      for (const circleId of this.selectedCircles) {
+        const students = await this.studentRepo.findByCircleId(circleId);
+        allStudents.push(...students);
+        for (const st of students) {
+          if (st.id) {
+            const hws = await this.homeworkRepo.findByStudentId(st.id);
+            allHomeworks.push(...hws);
+          }
+        }
+      }
+
+      const start = new Date(data.startDate).getTime();
+      const endObj = new Date(data.endDate);
+      endObj.setHours(23, 59, 59, 999);
+      const end = endObj.getTime();
+
+      const filteredHomeworks = allHomeworks.filter((h) => {
+        const d = new Date(h.date_assigned!).getTime();
+        return d >= start && d <= end;
+      });
+
+      if (this.selectedCircles.size === 1) {
+        await this.excelService.generateCircleExcel(
+          allStudents,
+          filteredHomeworks,
+          displayMode
+        );
+      } else {
+        await this.excelService.generateMultipleCirclesExcel(
+          allStudents,
+          filteredHomeworks,
+          displayMode
+        );
+      }
+    }
   }
 
   ngOnInit() {
@@ -328,6 +371,7 @@ export class MyCirclesComponent implements OnInit {
       'albums-outline': albumsOutline,
       'chevron-back': chevronBack,
       'checkmark-circle': checkmarkCircle,
+      book,
     });
   }
 }

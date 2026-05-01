@@ -1,104 +1,72 @@
-@if (selectionMode) {
-  <div class="selection-bar">
-    <div class="rtl-row" style="gap: 4px;">
-    <ion-button
-      fill="solid"
-      color="danger"
-      size="small"
-      (click)="deleteSelected()"
-    >
-      <ion-icon name="trash" slot="start"></ion-icon>
-      حذف
-    </ion-button>
-    <ion-button
-      fill="solid"
-      color="primary"
-      size="small"
-      (click)="shareSelected()"
-    >
-      <ion-icon name="share-social" slot="start"></ion-icon>
-      مشاركة
-    </ion-button>
-    <ion-button
-      fill="solid"
-      color="success"
-      size="small"
-      (click)="extractSummary()"
-    >
-      <ion-icon name="document-text" slot="start"></ion-icon>
-      تقرير
-    </ion-button>
-    </div>
-    <ion-button fill="clear" color="medium" (click)="cancelSelection()">
-      <ion-icon name="close" slot="icon-only"></ion-icon>
-    </ion-button>
-  </div>
-} @else {
-  <div class="greeting-bar">
-    <p class="greeting-text">
-      السَّلَامُ عَلَيْكُمْ، <span class="greeting-name">{{ teacher?.name }}</span>
-    </p>
-    <!-- Hidden file input -->
-    <input
-      type="file"
-      id="fileImport"
-      accept=".json"
-      style="display: none"
-      (change)="onFileSelected($event)"
-    />
-    <ion-button fill="solid" size="small" (click)="importCircle()">
-      <ion-icon name="cloud-upload" slot="start"></ion-icon>
-      استيراد
-    </ion-button>
-  </div>
-}
+<div class="greeting-bar">
+  <p class="greeting-text">
+    السَّلَامُ عَلَيْكُمْ،
+    <span class="greeting-name">{{ teacher?.name }}</span>
+  </p>
+  <!-- Hidden file input -->
+  <input
+    type="file"
+    id="fileImport"
+    accept=".json"
+    style="display: none"
+    (change)="onFileSelected($event)"
+  />
+  <ion-button fill="solid" size="small" (click)="importCircle()">
+    <ion-icon name="cloud-upload" slot="start"></ion-icon>
+    استيراد
+  </ion-button>
+</div>
 
 @for (circle of circles; track circle.id) {
-  <ion-card
-    button="true"
-    (touchstart)="startPress(circle)"
-    (touchend)="endPress()"
-    (touchmove)="endPress()"
-    (mousedown)="startPress(circle)"
-    (mouseup)="endPress()"
-    (mouseleave)="endPress()"
-    (click)="onCardClick(circle)"
-    [class.selected-card]="selectedCircles.has(circle.id!)"
-  >
-    <ion-card-content>
-      <div class="circle-card-inner">
-        <!-- Avatar -->
-        <div class="avatar-circle circle-avatar">
-          {{ circle.name.charAt(0) }}
-        </div>
-
-        <!-- Info -->
-        <div class="circle-info">
-          <h3 class="circle-name">{{ circle.name }}</h3>
-          <div class="card-meta">
-            <span class="meta-chip">
-              <ion-icon name="person"></ion-icon>
-              {{ findTeacherName(circle.teacher_id) }}
-            </span>
-            @if (circle.type) {
-              <span class="meta-chip type-chip">{{ circle.type }}</span>
-            }
-          </div>
-        </div>
-
-        <!-- Selected indicator -->
-        @if (selectedCircles.has(circle.id!)) {
-          <ion-icon name="checkmark-circle" class="selected-check" color="primary"></ion-icon>
-        } @else {
-          <ion-icon name="chevron-back" class="chevron-icon"></ion-icon>
-        }
+<ion-card
+  button="true"
+  (touchstart)="startPress(circle)"
+  (touchend)="endPress()"
+  (touchmove)="endPress()"
+  (mousedown)="startPress(circle)"
+  (mouseup)="endPress()"
+  (mouseleave)="endPress()"
+  (click)="onCardClick(circle)"
+  [class.selected-card]="selectedCircles.has(circle.id!)"
+>
+  <ion-card-content>
+    <div class="circle-card-inner">
+      <!-- Avatar -->
+      <div class="avatar-circle circle-avatar">
+        {{ circle.name.charAt(0) }}
       </div>
-    </ion-card-content>
-  </ion-card>
+
+      <!-- Info -->
+      <div class="circle-info">
+        <h3 class="circle-name">{{ circle.name }}</h3>
+        <div class="card-meta">
+          <span class="meta-chip">
+            <ion-icon name="person"></ion-icon>
+            {{ findTeacherName(circle.teacher_id) }}
+          </span>
+          @if (circle.type) {
+          <span class="meta-chip type-chip">{{ circle.type }}</span>
+          }
+        </div>
+      </div>
+
+      <!-- Selected indicator -->
+      @if (selectedCircles.has(circle.id!)) {
+      <ion-icon
+        name="checkmark-circle"
+        class="selected-check"
+        color="primary"
+      ></ion-icon>
+      } @else {
+      <ion-icon name="chevron-back" class="chevron-icon"></ion-icon>
+      }
+    </div>
+  </ion-card-content>
+</ion-card>
 } @empty {
-  <div class="empty-state">
-    <ion-icon name="cloud-download-outline"></ion-icon>
-    <p>لا توجد حلقات مشاركة</p>
-    <p style="font-size: 0.82rem;">اضغط «استيراد» لإضافة حلقة من ملف JSON</p>
-  </div>
+<div class="empty-state">
+  <ion-icon name="cloud-download-outline"></ion-icon>
+  <p>لا توجد حلقات مشاركة</p>
+  <p style="font-size: 0.82rem">اضغط «استيراد» لإضافة حلقة من ملف JSON</p>
+</div>
 }

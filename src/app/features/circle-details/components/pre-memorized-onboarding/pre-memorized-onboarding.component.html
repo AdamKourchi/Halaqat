@@ -1,0 +1,115 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-title>تسجيل الحفظ السابق</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" dir="rtl">
+
+  <!-- ── Explanation ─────────────────────────────────────────────── -->
+  <div class="info-card">
+    <ion-icon name="book-outline"></ion-icon>
+    <p>
+      حدّد الأجزاء التي كان الطالب قد حفظها قبل الانضمام إلى الحلقة.
+      ستظهر هذه الأجزاء بتنسيق مخصص في لوحة تقدم الحفظ.
+    </p>
+  </div>
+
+  <!-- ── Quick range ──────────────────────────────────────────────── -->
+  <p class="section-label">تحديد سريع بنطاق الأحزاب</p>
+  <div class="range-row">
+    <ion-item class="range-item" lines="none">
+      <ion-input
+        label="من حزب"
+        type="number"
+        [(ngModel)]="fromHizb"
+        min="1" max="60"
+        placeholder="1"
+      ></ion-input>
+    </ion-item>
+    <span class="range-sep">←</span>
+    <ion-item class="range-item" lines="none">
+      <ion-input
+        label="إلى حزب"
+        type="number"
+        [(ngModel)]="toHizb"
+        min="1" max="60"
+        placeholder="60"
+      ></ion-input>
+    </ion-item>
+    <ion-button fill="solid" size="small" (click)="applyQuickRange()">
+      تطبيق
+    </ion-button>
+  </div>
+
+  <ion-button
+    fill="clear" size="small" color="danger"
+    (click)="clearAll()"
+    style="margin-bottom: 12px;"
+  >
+    مسح الكل
+  </ion-button>
+
+  <!-- ── Hizb list ─────────────────────────────────────────────────── -->
+  <p class="section-label">أو اختر يدوياً</p>
+  <div class="hizb-list">
+    @for (row of hizbRows; track row.hizb_number) {
+    <div class="hizb-row" [class.has-selection]="hasSomeSelected(row)">
+
+      <!-- Hizb header row -->
+      <div class="hizb-row-header">
+        <ion-checkbox
+          [checked]="row.allSelected"
+          (ionChange)="toggleHizbAll(row)"
+          labelPlacement="end"
+        >
+          الحزب {{ row.hizb_number }}
+        </ion-checkbox>
+        <ion-button fill="clear" size="small" (click)="toggleExpand(row)">
+          <ion-icon
+            slot="icon-only"
+            [name]="row.expanded ? 'remove-circle-outline' : 'add-circle-outline'"
+          ></ion-icon>
+        </ion-button>
+      </div>
+
+      <!-- Thumun checkboxes (expanded) -->
+      @if (row.expanded) {
+      <div class="thumun-checks">
+        @for (t of row.thumuns; track t.thumun_number) {
+        <ion-checkbox
+          [(ngModel)]="t.selected"
+          (ionChange)="onThumunToggle(row)"
+          labelPlacement="end"
+          class="thumun-check"
+        >
+          ثُمن {{ t.thumun_number }}
+        </ion-checkbox>
+        }
+      </div>
+      }
+
+    </div>
+    }
+  </div>
+
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-button
+      expand="block"
+      [disabled]="saving || selectedCount === 0"
+      (click)="save()"
+      class="ion-margin"
+    >
+      <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+      حفظ {{ selectedCount }} ثُمن
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

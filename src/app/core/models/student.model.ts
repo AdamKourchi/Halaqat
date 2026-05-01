@@ -7,6 +7,7 @@ export interface Student {
   enlistment_date?: string;
   parent_name?: string | null;
   parent_contact?: string | null;
+  medical_issues?: string | null;
   
   // Computed fields (not physical DB columns)
   is_graded_today?: boolean;

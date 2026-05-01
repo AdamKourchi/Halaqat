@@ -106,4 +106,11 @@ export class DatabaseService {
       await this.sqlite.closeConnection(DB_NAME, false);
     }
   }
+
+  /** Run the database seeder */
+  async seedDatabase(): Promise<void> {
+    const db = this.getDb();
+    const { seedHalaqatData } = await import('./seeders/test_seeder');
+    await seedHalaqatData(db);
+  }
 }

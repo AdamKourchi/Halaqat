@@ -9,6 +9,7 @@
 import { migration001 } from './001_initial_schema.migration';
 import { migration002 } from './002_domain_tables.migration';
 import { migration003 } from './003_quran_seed.migration';
+import { migration004 } from './004_progress_table_redesign.migration';
 
 import { Migration } from './migration.interface';
 
@@ -16,4 +17,5 @@ export const ALL_MIGRATIONS: Migration[] = [
   migration001,
   migration002,
   migration003,
+  migration004,
 ];

@@ -32,6 +32,7 @@ import {
   IonCardHeader,
   IonCardTitle,
   IonCardContent,
+  IonFooter,
 } from '@ionic/angular/standalone';
 
 @Component({
@@ -55,6 +56,7 @@ import {
     IonCardHeader,
     IonCardTitle,
     IonCardContent,
+    IonFooter,
   ],
 })
 export class HomeworksComponent implements OnInit {
@@ -79,8 +81,6 @@ export class HomeworksComponent implements OnInit {
   gradingMarksHelper = inject(GradingMarksHelper);
 
   get isSharedCircle(): boolean {
-    console.log(this.circle?.teacher_id, this.user?.id);
-    
     return this.circle?.teacher_id !== this.user?.id;
   }
 

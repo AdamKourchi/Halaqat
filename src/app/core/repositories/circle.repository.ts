@@ -85,25 +85,22 @@ export class CircleRepository extends BaseRepository {
     ]);
   }
 
-  async delete(id: string): Promise<void> {
-    //Delete  the teacher if he doesnt have other circle
+async delete(id: string): Promise<void> {
+    // 1. Handle the teacher logic
     const circle = await this.findById(id);
-    const teacher = await this.teacherRepo.findById(circle?.teacher_id || '');
     if (circle) {
+      const teacher = await this.teacherRepo.findById(circle.teacher_id || '');
       const teacherCircles = await this.findByTeacherId(circle.teacher_id);
+      
       if (teacherCircles.length === 1 && teacher && !teacher.is_owner) {
         await this.teacherRepo.delete(teacher.id);
       }
     }
-    //Delete the students and their homeworks :
-    const students = await this.studentRepo.findByCircleId(id);
-    const homeworks = await this.homeworkRepo.findByCircleId(id);
-    for (const student of students) {
-      if (student.id) await this.studentRepo.delete(student.id);
-    }
-    for (const homework of homeworks) {
-      if (homework.id) await this.homeworkRepo.delete(homework.id);
-    }
+
+    await this.run('DELETE FROM homeworks WHERE circle_id = ?', [id]);
+
+    await this.run('DELETE FROM students WHERE circle_id = ?', [id]);
+
     await this.run('DELETE FROM circles WHERE id = ?', [id]);
   }
 

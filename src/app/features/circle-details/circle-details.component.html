@@ -10,40 +10,6 @@
 </ion-header>
 
 <ion-content fixed-slot-placement="before">
-  <!-- ── Selection Toolbar ──────────────────── -->
-  @if (selectionMode) {
-  <div class="selection-bar">
-    <div class="rtl-row" style="gap: 4px">
-      @if (!isSharedCircle) {
-      <ion-button size="small" fill="solid" color="danger" (click)="deleteSelected()">
-        <ion-icon name="trash" slot="start"></ion-icon>
-        حذف
-      </ion-button>
-      }
-      <!-- <ion-button fill="clear" color="primary" (click)="shareSelected()">
-          <ion-icon name="share-social" slot="icon-only"></ion-icon>
-        </ion-button> -->
-      <ion-button size="small" fill="solid" color="success" (click)="extractSummary()">
-        <ion-icon name="document-text" slot="start"></ion-icon>
-        تقرير
-      </ion-button>
-      @if (!isSharedCircle && selectedStudents.size === 1) {
-      <ion-button size="small" fill="solid" color="primary" (click)="editSelected()">
-        <ion-icon name="pencil" slot="start"></ion-icon>
-        تعديل
-      </ion-button>
-    }
-    <ion-button size="small" fill="solid" color="warning" (click)="openHomeworks()">
-      <ion-icon name="book-outline" slot="start"></ion-icon>
-      واجبات
-    </ion-button>
-    </div>
-    <ion-button fill="clear" color="medium" (click)="cancelSelection()">
-      <ion-icon name="close" slot="icon-only"></ion-icon>
-    </ion-button>
-  </div>
-
-  } @else {
   <!-- ── Circle Header ──────────────────────── -->
   <div class="circle-header">
     <div class="circle-header-info">
@@ -68,7 +34,6 @@
       }
     </div>
   </div>
-  }
 
   <!-- ── Filter Segment ────────────────────── -->
   <ion-segment
@@ -102,12 +67,20 @@
     <ion-card-content>
       <div class="student-card-inner">
         <!-- Avatar -->
-        <div
-          class="avatar-circle student-avatar"
-          [class.avatar-male]="student.gender === 'Male'"
-          [class.avatar-female]="student.gender === 'Female'"
-        >
-          {{ student.name.charAt(0) }}
+        <div class="avatar-wrapper">
+          <div
+            class="avatar-circle student-avatar"
+            [class.avatar-male]="student.gender === 'Male'"
+            [class.avatar-female]="student.gender === 'Female'"
+          >
+            {{ student.name.charAt(0) }}
+          </div>
+          @if (student.medical_issues) {
+          <ion-icon
+            name="accessibility-outline"
+            class="medical-badge"
+          ></ion-icon>
+          }
         </div>
 
         <!-- Info -->
@@ -152,3 +125,41 @@
   </div>
   }
 </ion-content>
+
+@if (selectionMode) {
+<ion-tab-bar slot="bottom">
+  @if (!isSharedCircle) {
+  <ion-tab-button (click)="deleteSelected()">
+    <ion-icon name="trash"></ion-icon>
+    حذف
+  </ion-tab-button>
+
+  }
+
+  <ion-tab-button (click)="extractSummary()">
+    <ion-icon name="document-text"></ion-icon>
+    تقرير
+  </ion-tab-button>
+
+  @if (!isSharedCircle && selectedStudents.size === 1) {
+  <ion-tab-button (click)="editSelected()">
+    <ion-icon name="pencil"></ion-icon>
+    تفاصيل
+  </ion-tab-button>
+
+  <ion-tab-button (click)="openHomeworks()">
+    <ion-icon name="book-outline"></ion-icon>
+    واجبات
+  </ion-tab-button>
+  
+}
+<ion-tab-button fill="clear" color="medium" (click)="cancelSelection()">
+  <ion-icon name="close"></ion-icon>
+      إلغاء
+</ion-tab-button>
+</ion-tab-bar>
+}@else{
+
+<ion-footer style="height: 50px"> </ion-footer>
+
+}

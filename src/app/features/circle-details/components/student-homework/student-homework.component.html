@@ -10,189 +10,369 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-
-  <!-- ── Pending Grading ───────────────────── -->
+  <!-- ── Pending Grading ───────────────────────── -->
   @if (ungradedHomework) {
-    <div class="hw-card pending-card" dir="rtl">
-      <div class="hw-card-accent pending-accent"></div>
-      <div class="hw-card-body">
-        <div class="hw-card-title-row">
-          <ion-icon name="alert-circle" color="warning"></ion-icon>
-          <span class="hw-card-title warning-text">في انتظار التقييم</span>
+  <div class="hw-card pending-card" dir="rtl">
+    <div class="hw-card-accent pending-accent"></div>
+    <div class="hw-card-body">
+      <div class="hw-card-title-row">
+        <ion-icon name="alert-circle" color="warning"></ion-icon>
+        <span class="hw-card-title warning-text">في انتظار التقييم</span>
+      </div>
+
+      <!-- Range summary -->
+      <div class="range-summary">
+        <div class="range-item">
+          <span class="range-label">من</span>
+          <span class="range-value"
+            >{{ getSurahName(ungradedHomework.start_surah) }} ({{
+              ungradedHomework.start_ayah
+            }})</span
+          >
+          <span class="range-label">إلى</span>
+          <span class="range-value"
+            >{{ getSurahName(ungradedHomework.end_surah) }} ({{
+              ungradedHomework.end_ayah
+            }})</span
+          >
         </div>
 
-        <!-- Range summary -->
-        <div class="range-summary">
-          <div class="range-item">
-            <span class="range-label">من</span>
-            <span class="range-value">{{ getSurahName(ungradedHomework.start_surah) }} — آية {{ ungradedHomework.start_ayah }}</span>
-          </div>
-          <div class="range-divider">
-            <ion-icon name="arrow-down-outline"></ion-icon>
-          </div>
-          <div class="range-item">
-            <span class="range-label">إلى</span>
-            <span class="range-value">{{ getSurahName(ungradedHomework.end_surah) }} — آية {{ ungradedHomework.end_ayah }}</span>
-          </div>
+        <p class="range-label">{{ ungradedHomeworkHizbLabel }}</p>
+      </div>
+
+      <!-- Quran Passage Toggle -->
+      <div class="quran-passage">
+        <div class="quran-toggle-row">
+          <span class="section-label">النص القرآني</span>
+          <ion-button fill="clear" size="small" (click)="toggleQuranPassage()">
+            <ion-icon
+              slot="icon-only"
+              [name]="showQuranPassage ? 'eye-off-outline' : 'eye-outline'"
+            ></ion-icon>
+          </ion-button>
         </div>
 
-        <!-- Quran Passage Toggle -->
-        <div class="quran-passage">
-          <div class="quran-toggle-row">
-            <span class="section-label">النص القرآني</span>
-            <ion-button fill="clear" size="small" (click)="toggleQuranPassage()">
-              <ion-icon slot="icon-only" [name]="showQuranPassage ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
-            </ion-button>
+        @if (showQuranPassage) {
+        <div class="quran-text-container">
+          <p class="quran-text">
+            @for (ayah of paginatedPassage; track $index) {
+            {{ ayah.text_warsh }}
+            <span class="ayah-number">({{ ayah.ayah_number }})</span>
+            }
+          </p>
+
+          @if (totalPages > 1) {
+          <div class="pagination-controls">
+            <ion-button
+              fill="clear"
+              size="small"
+              (click)="prevPage()"
+              [disabled]="currentPage === 1"
+              >السابق</ion-button
+            >
+            <span class="page-indicator"
+              >{{ currentPage }} / {{ totalPages }}</span
+            >
+            <ion-button
+              fill="clear"
+              size="small"
+              (click)="nextPage()"
+              [disabled]="currentPage === totalPages"
+              >التالي</ion-button
+            >
           </div>
+          }
+        </div>
+        }
+      </div>
 
-          @if (showQuranPassage) {
-            <div class="quran-text-container">
-              <p class="quran-text">
-                @for (ayah of paginatedPassage; track $index) {
-                  {{ ayah.text_warsh }}
-                  <span class="ayah-number">﴿{{ ayah.ayah_number }}﴾</span>
-                }
-              </p>
+      <!-- Grading Form -->
+      @if (!isSharedCircle) {
+      <div class="grade-section">
+        <p class="section-label">تقييم التسميع</p>
 
-              @if (totalPages > 1) {
-                <div class="pagination-controls">
-                  <ion-button fill="clear" size="small" (click)="prevPage()" [disabled]="currentPage === 1">السابق</ion-button>
-                  <span class="page-indicator">{{ currentPage }} / {{ totalPages }}</span>
-                  <ion-button fill="clear" size="small" (click)="nextPage()" [disabled]="currentPage === totalPages">التالي</ion-button>
-                </div>
+        <ion-list lines="none" class="grade-list">
+          <ion-item class="grade-item">
+            <ion-select
+              cancelText="إلغاء"
+              okText="حسنا"
+              label="التقييم"
+              [(ngModel)]="gradeMark"
+              placeholder="اختر التقييم"
+            >
+              @for (grade of grades; track $index) {
+              <ion-select-option [value]="grade.key">{{
+                grade.value
+              }}</ion-select-option>
               }
-            </div>
+            </ion-select>
+          </ion-item>
+
+          <ion-item class="grade-item">
+            <ion-input
+              label="عدد الأخطاء"
+              type="number"
+              [(ngModel)]="mistakesCount"
+              placeholder="0"
+            ></ion-input>
+          </ion-item>
+
+          <ion-item class="grade-item">
+            <ion-textarea
+              label="ملاحظات"
+              [(ngModel)]="remark"
+              placeholder="أية تعليقات إضافية..."
+              autoGrow="true"
+            ></ion-textarea>
+          </ion-item>
+          
+          <ion-item class="grade-item">
+            <ion-icon name="logo-whatsapp" slot="start" color="success"></ion-icon>
+            <ion-label>مشاركة التقييم عبر واتساب</ion-label>
+            <ion-toggle [(ngModel)]="shareGradeViaWhatsapp" slot="end"></ion-toggle>
+          </ion-item>
+        </ion-list>
+
+        <ion-button
+          expand="block"
+          class="ion-margin-top"
+          (click)="submitGrade()"
+          color="success"
+        >
+          <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+          حفظ التقييم
+        </ion-button>
+      </div>
+      }
+    </div>
+  </div>
+
+  } @else {
+  <!-- ── Assign Homework ─────────────────────── -->
+  @if (!isSharedCircle) {
+  <div class="hw-card assign-card" dir="rtl">
+    <div class="hw-card-accent assign-accent"></div>
+    <div class="hw-card-body">
+      <div class="hw-card-title-row">
+        <ion-icon name="checkmark-circle" color="primary"></ion-icon>
+        <span class="hw-card-title">لا يوجد واجبات معلقة</span>
+      </div>
+      <p class="hw-card-sub">قم بتعيين الواجب الجديد بالأسفل.</p>
+
+      <!-- ── Mode Toggle ──────────────────────────── -->
+      <p class="section-label" style="margin-top: 16px">طريقة تحديد الواجب</p>
+      <ion-segment
+        [(ngModel)]="assignMode"
+        (ionChange)="onAssignModeChange()"
+        class="assign-mode-segment"
+      >
+        <ion-segment-button value="ayah">
+          <ion-label>سورة / آية</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="hizb">
+          <ion-label>حزب / ثُمن</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+
+      <!-- ════════════════════════════════════════════ -->
+      <!-- MODE A: Classic Surah / Ayah               -->
+      <!-- ════════════════════════════════════════════ -->
+      @if (assignMode === 'ayah') {
+      <p class="section-label" style="margin-top: 16px">متن الواجب الجديد</p>
+
+      <ion-list lines="none" class="grade-list">
+        <ion-item class="grade-item">
+          <ion-select
+            okText="تأكيد"
+            cancelText="إلغاء"
+            label="سورة البداية"
+            [(ngModel)]="newStartSurah"
+            (ionChange)="onStartSurahChange()"
+            placeholder="اختر السورة"
+          >
+            @for (s of surahs; track $index) {
+            <ion-select-option [value]="s.id"
+              >{{ s.id }}. {{ s.name_arabic }}</ion-select-option
+            >
+            }
+          </ion-select>
+        </ion-item>
+
+        <ion-item class="grade-item">
+          <ion-input
+            label="آية البداية"
+            type="number"
+            [(ngModel)]="newStartAyah"
+            min="1"
+            [max]="getMaxAyahs(newStartSurah)"
+          ></ion-input>
+        </ion-item>
+
+        <ion-item class="grade-item">
+          <ion-select
+            okText="تأكيد"
+            cancelText="إلغاء"
+            label="سورة النهاية"
+            [(ngModel)]="newEndSurah"
+            placeholder="اختر السورة"
+          >
+            @for (s of surahs; track $index) {
+            <ion-select-option [value]="s.id"
+              >{{ s.id }}. {{ s.name_arabic }}</ion-select-option
+            >
+            }
+          </ion-select>
+        </ion-item>
+
+        @if (newEndSurah) {
+        <ion-item class="grade-item">
+          <ion-input
+            label="آية النهاية"
+            type="number"
+            [(ngModel)]="newEndAyah"
+            min="1"
+            [max]="getMaxAyahs(newEndSurah)"
+          ></ion-input>
+        </ion-item>
+        }
+      </ion-list>
+      }
+
+      <!-- ════════════════════════════════════════════ -->
+      <!-- MODE B: Hizb / Thumun                      -->
+      <!-- ════════════════════════════════════════════ -->
+      @if (assignMode === 'hizb') {
+      <div class="hizb-form">
+        <!-- 1. Hizb number -->
+        <p class="section-label" style="margin-top: 16px">رقم الحزب (1–60)</p>
+        <ion-list lines="none" class="grade-list">
+          <ion-item class="grade-item">
+            <ion-input
+              label="رقم الحزب"
+              type="number"
+              [(ngModel)]="hizbNumber"
+              min="1"
+              max="60"
+              placeholder="مثال: 3"
+              (ionInput)="updateHizbPreview()"
+            ></ion-input>
+          </ion-item>
+        </ion-list>
+
+        <!-- 2. Division size selector -->
+        <p class="section-label" style="margin-top: 16px">حجم الواجب</p>
+        <div class="division-grid">
+          @for (opt of divisionOptions; track opt.count) {
+          <button
+            class="division-btn"
+            [class.active]="thumunCount === opt.count"
+            (click)="thumunCount = opt.count; onDivisionCountChange()"
+          >
+            {{ opt.label }}
+          </button>
           }
         </div>
 
-        <!-- Grading Form -->
-        @if (!isSharedCircle) {
-          <div class="grade-section">
-            <p class="section-label">تقييم التسميع</p>
+        <!-- 3. Sub-division picker (not shown for full Hizb) -->
+        @if (thumunCount !== 8) {
+        <p class="section-label" style="margin-top: 16px">
+          @if (thumunCount === 4) { أي نصف؟ } @if (thumunCount === 2) { أي ربع؟
+          } @if (thumunCount === 1) { أي ثُمن؟ }
+        </p>
+        <div class="subdivision-grid">
+          @for (sub of validSubdivisions; track sub.index) {
+          <button
+            class="subdivision-btn"
+            [class.active]="subdivisionIndex === sub.index"
+            (click)="subdivisionIndex = sub.index; updateHizbPreview()"
+          >
+            {{ sub.label }}
+          </button>
+          }
+        </div>
+        }
 
-            <ion-list lines="none" class="grade-list">
-              <ion-item class="grade-item">
-                <ion-select
-                  cancelText="إلغاء"
-                  okText="حسنا"
-                  label="التقييم"
-                  [(ngModel)]="gradeMark"
-                  placeholder="اختر التقييم"
-                >
-                  @for (grade of grades; track $index) {
-                    <ion-select-option [value]="grade.key">{{ grade.value }}</ion-select-option>
-                  }
-                </ion-select>
-              </ion-item>
-
-              <ion-item class="grade-item">
-                <ion-input
-                  label="عدد الأخطاء"
-                  type="number"
-                  [(ngModel)]="mistakesCount"
-                  placeholder="0"
-                ></ion-input>
-              </ion-item>
-
-              <ion-item class="grade-item">
-                <ion-textarea
-                  label="ملاحظات"
-                  [(ngModel)]="remark"
-                  placeholder="أية تعليقات إضافية..."
-                  autoGrow="true"
-                ></ion-textarea>
-              </ion-item>
-            </ion-list>
-
-            <ion-button
-              expand="block"
-              class="ion-margin-top"
-              (click)="submitGrade()"
-              color="success"
-            >
-              <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
-              حفظ التقييم
-            </ion-button>
+        <!-- 4. Live Preview -->
+        @if (hizbPreview) {
+        <div class="hizb-preview-box">
+          <ion-icon name="book-outline" class="preview-icon"></ion-icon>
+          <div class="preview-lines">
+            @for (line of hizbPreview.split('\n'); track $index) {
+            <span>{{ line }}</span>
+            }
           </div>
+        </div>
         }
       </div>
+      }
+      <!-- ════════════════════════════════════════════ -->
+      <!-- Audio & Sharing (Optional)                   -->
+      <!-- ════════════════════════════════════════════ -->
+      <p class="section-label" style="margin-top: 16px">إضافات (اختياري)</p>
+      <ion-list lines="none" class="grade-list">
+        <ion-item class="grade-item">
+          <ion-icon name="mic-outline" slot="start" color="medium"></ion-icon>
+          <div class="audio-input-container" style="width: 100%; display: flex; flex-direction: column; padding: 12px 0;">
+            <ion-label style="margin-bottom: 8px;">إرفاق رسالة صوتية</ion-label>
+            
+            @if (!selectedAudioFile && !isRecording) {
+              <div style="display: flex; gap: 8px;">
+                <ion-button fill="outline" color="danger" size="small" (click)="startRecording()" style="flex: 1; margin: 0; --padding-start: 0; --padding-end: 0;">
+                  <ion-icon name="radio-button-on-outline" slot="start"></ion-icon>
+                  تسجيل الآن
+                </ion-button>
+                <ion-button fill="outline" color="primary" size="small" (click)="audioInput.click()" style="flex: 1; margin: 0; --padding-start: 0; --padding-end: 0;">
+                  <ion-icon name="folder-open-outline" slot="start"></ion-icon>
+                  اختيار ملف
+                </ion-button>
+              </div>
+            } @else if (isRecording) {
+              <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(var(--ion-color-danger-rgb), 0.1); padding: 8px 12px; border-radius: 8px;">
+                <div style="display: flex; align-items: center; color: var(--ion-color-danger); font-weight: bold; font-size: 0.9rem;">
+                  <ion-icon name="radio-button-on-outline" style="margin-inline-end: 8px; animation: pulse 1.5s infinite;"></ion-icon>
+                  <span>جاري التسجيل... {{ recordingTime }}ث</span>
+                </div>
+                <ion-button fill="solid" color="danger" size="small" (click)="stopRecording()" style="margin: 0;">
+                  <ion-icon name="stop-circle-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+              </div>
+            } @else {
+              <div class="selected-file-chip" style="display: flex; align-items: center; background: rgba(var(--ion-color-primary-rgb), 0.05); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);">
+                <ion-icon name="musical-notes-outline" color="primary" style="margin-inline-end: 8px;"></ion-icon>
+                <span style="flex: 1; font-size: 0.85rem; color: var(--ion-color-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: ltr; text-align: right;">{{ selectedAudioFile?.name || 'تم إرفاق ملف صوتي' }}</span>
+                <ion-button fill="clear" color="danger" size="small" (click)="clearAudio()" style="margin: 0;">
+                  <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+              </div>
+            }
+            <input #audioInput type="file" accept="audio/*" capture="microphone" (change)="onAudioSelected($event)" style="display: none;" />
+          </div>
+        </ion-item>
+        
+        <ion-item class="grade-item">
+          <ion-icon name="logo-whatsapp" slot="start" color="success"></ion-icon>
+          <ion-label>مشاركة الواجب عبر واتساب</ion-label>
+          <ion-toggle [(ngModel)]="shareViaWhatsapp" slot="end"></ion-toggle>
+        </ion-item>
+      </ion-list>
+      <!-- ════════════════════════════════════════════ -->
+
+      <ion-button
+        expand="block"
+        class="ion-margin-top"
+        (click)="assignNewHomework()"
+      >
+        <ion-icon name="bookmark-outline" slot="start"></ion-icon>
+        تعيين الواجب
+      </ion-button>
     </div>
+  </div>
 
   } @else {
-    <!-- ── Assign Homework ─────────────────── -->
-    @if (!isSharedCircle) {
-      <div class="hw-card assign-card" dir="rtl">
-        <div class="hw-card-accent assign-accent"></div>
-        <div class="hw-card-body">
-          <div class="hw-card-title-row">
-            <ion-icon name="checkmark-circle" color="primary"></ion-icon>
-            <span class="hw-card-title">لا يوجد واجبات معلقة</span>
-          </div>
-          <p class="hw-card-sub">قم بتعيين الواجب الجديد بالأسفل.</p>
-
-          <p class="section-label" style="margin-top: 16px;">متن الواجب الجديد</p>
-
-          <ion-list lines="none" class="grade-list">
-            <ion-item class="grade-item">
-              <ion-select
-              okText="تأكيد"
-              cancelText="إلغاء"
-                label="سورة البداية"
-                [(ngModel)]="newStartSurah"
-                (ionChange)="onStartSurahChange()"
-                placeholder="اختر السورة"
-              >
-                @for (s of surahs; track $index) {
-                  <ion-select-option [value]="s.id">{{ s.id }}. {{ s.name_arabic }}</ion-select-option>
-                }
-              </ion-select>
-            </ion-item>
-            <ion-item class="grade-item">
-              <ion-input
-                label="آية البداية"
-                type="number"
-                [(ngModel)]="newStartAyah"
-                min="1"
-                [max]="getMaxAyahs(newStartSurah)"
-              ></ion-input>
-            </ion-item>
-
-            <ion-item class="grade-item">
-              <ion-select
-              okText="تأكيد"
-              cancelText="إلغاء"
-                label="سورة النهاية"
-                [(ngModel)]="newEndSurah"
-                placeholder="اختر السورة"
-              >
-                <ion-select-option *ngFor="let s of surahs" [value]="s.id">{{ s.id }}. {{ s.name_arabic }}</ion-select-option>
-              </ion-select>
-            </ion-item>
-            <ion-item *ngIf="newEndSurah" class="grade-item">
-              <ion-input
-                label="آية النهاية"
-                type="number"
-                [(ngModel)]="newEndAyah"
-                min="1"
-                [max]="getMaxAyahs(newEndSurah)"
-              ></ion-input>
-            </ion-item>
-          </ion-list>
-
-          <ion-button expand="block" class="ion-margin-top" (click)="assignNewHomework()">
-            <ion-icon name="bookmark-outline" slot="start"></ion-icon>
-            تعيين الواجب
-          </ion-button>
-        </div>
-      </div>
-
-    } @else {
-      <div class="empty-state">
-        <ion-icon name="book-outline"></ion-icon>
-        <p>هذه الحلقة للعرض فقط</p>
-        <p style="font-size: 0.82rem;">لا يمكن إضافة أو تعديل الواجبات هنا</p>
-      </div>
-    }
-  }
-
+  <div class="empty-state">
+    <ion-icon name="book-outline"></ion-icon>
+    <p>هذه الحلقة للعرض فقط</p>
+    <p style="font-size: 0.82rem">لا يمكن إضافة أو تعديل الواجبات هنا</p>
+  </div>
+  } }
 </ion-content>

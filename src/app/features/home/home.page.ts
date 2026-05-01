@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import {
   IonHeader,
   IonToolbar,
@@ -9,11 +9,14 @@ import {
   IonSegmentButton,
   IonPopover,
   IonToggle,
+  IonFooter,
+  IonTabBar,
+  IonTabButton
 } from '@ionic/angular/standalone';
 import { TeacherRepository, ThemeService } from '@core';
 import { MyCirclesComponent } from '../my-circles/my-circles.component';
 import { SharedCirclesComponent } from '../shared-circles/shared-circles.component';
-import { ModalController, IonButtons, IonButton, IonIcon } from '@ionic/angular/standalone';
+import { ModalController, IonButtons, IonButton, IonIcon} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   documentTextOutline,
@@ -43,6 +46,9 @@ import { GlobalExtractModalComponent } from './components/global-extract-modal/g
     IonIcon,
     IonPopover,
     IonToggle,
+    IonFooter,
+    IonTabBar,
+    IonTabButton
   ],
 })
 export class HomePage implements OnInit {
@@ -54,6 +60,32 @@ export class HomePage implements OnInit {
   private teacherRepo = inject(TeacherRepository);
   private cdr = inject(ChangeDetectorRef);
   private modalCtrl = inject(ModalController);
+
+  // Grab a reference to the child component
+  @ViewChild(MyCirclesComponent) myCirclesComponent!: MyCirclesComponent;
+  @ViewChild(SharedCirclesComponent) sharedCirclesComponent!: SharedCirclesComponent;
+
+  // Track the state for the UI
+  isSelectionActive = false;
+  selectedCount = 0;
+
+  // Listen to the child
+  onSelectionStateChange(state: { isActive: boolean; count: number }) {
+    this.isSelectionActive = state.isActive;
+    this.selectedCount = state.count;
+  }
+
+  // Footer Button Actions (These just pass the command down to the child)
+  triggerDelete() { this.myCirclesComponent?.deleteSelected(); }
+  triggerSummary() { this.myCirclesComponent?.extractSummary(); }
+  triggerShare() { this.myCirclesComponent?.shareSelected(); }
+  triggerEdit() { this.myCirclesComponent?.editSelected(); }
+  triggerCancel() { this.myCirclesComponent?.cancelSelection(); }
+
+  triggerDeleteShared() { this.sharedCirclesComponent?.deleteSelected(); }
+  triggerSummaryShared() { this.sharedCirclesComponent?.extractSummary(); }
+  triggerShareShared() { this.sharedCirclesComponent?.shareSelected(); }
+  triggerCancelShared() { this.sharedCirclesComponent?.cancelSelection(); }
 
   segmentChanged(event: any) {
     this.segmentValue = event.detail.value;

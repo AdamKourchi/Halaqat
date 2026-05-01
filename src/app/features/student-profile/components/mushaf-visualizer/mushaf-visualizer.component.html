@@ -1,0 +1,152 @@
+<ng-container>
+  <!-- ── Loading skeleton ─────────────────────────────────── -->
+  @if (loading) {
+  <div class="skeleton-list">
+    @for (item of [1,2,3]; track $index) {
+      <div class="skeleton-card"></div>
+    }
+  </div>
+  }
+
+  <!-- ── Loaded state ─────────────────────────────────────── -->
+  @else {
+
+  <!-- Overall Quran progress ring -->
+  <div class="overall-stat">
+    <div class="overall-ring">
+      <svg viewBox="0 0 80 80">
+        <circle class="ring-bg" cx="40" cy="40" r="32" />
+        <circle
+          class="ring-fill"
+          cx="40" cy="40" r="32"
+          [attr.stroke-dasharray]="ringCircumference"
+          [attr.stroke-dashoffset]="ringOffset"
+        />
+      </svg>
+      <span class="ring-label">{{ overallPct }}%</span>
+    </div>
+    <div class="overall-text">
+      <h3>حفظ القرآن الكريم</h3>
+      <p>
+        {{ totalThumunsMemorized }} ثُمن محفوظ من أصل 480<br />
+        ({{ hizbVMs.length }} حزب من أصل 60)
+      </p>
+      <ion-button fill="clear" size="small" color="primary" (click)="recalculateProgress()" style="margin-top: 4px; --padding-start: 0; font-weight: 500;">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+        إعادة حساب التقدم
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- ── Empty state ─────────────────────────────────────────── -->
+  @if (hizbVMs.length === 0) {
+  <div class="empty-state">
+    <ion-icon name="book-outline"></ion-icon>
+    <p>لم يُسجَّل أي حفظ بعد.<br />سيظهر التقدم هنا بعد تقييم أول واجب.</p>
+  </div>
+  }
+
+  <!-- ── Hizb cards ───────────────────────────────────────────── -->
+  @else {
+  <p class="section-title">الأحزاب المحفوظة</p>
+  <div class="hizb-list">
+    @for (hizb of hizbVMs; track hizb.hizb_number) {
+    <div class="hizb-card" [class]="'decay-' + hizb.decay_status">
+
+      <!-- Card header (tap to expand) -->
+      <div class="hizb-header" (click)="toggleHizb(hizb.hizb_number)">
+        <div class="hizb-number-badge" [class]="'decay-' + hizb.decay_status">
+          {{ hizb.hizb_number }}
+        </div>
+        <div class="hizb-info">
+          <div class="hizb-title">الحزب {{ hizb.hizb_number }}</div>
+          <div class="hizb-sub">
+            {{ hizb.memorized_count }}/8 ثُمن ·
+            {{ scoreLabel(hizb.avg_score) }}
+          </div>
+        </div>
+        <div class="hizb-right">
+          <span class="completion-chip" [class]="'decay-' + hizb.decay_status">
+            {{ hizb.completion_pct | number:'1.0-0' }}%
+          </span>
+          <span class="score-chip">{{ hizb.avg_score | number:'1.1-1' }}/4</span>
+        </div>
+        <ion-icon
+          name="chevron-down-outline"
+          class="expand-icon"
+          [class.open]="expandedHizbs.has(hizb.hizb_number)"
+        ></ion-icon>
+      </div>
+
+      <!-- Thumun grid (expanded) -->
+      @if (expandedHizbs.has(hizb.hizb_number)) {
+      <div class="thumun-grid">
+        @for (thumun of allEightThumuns(hizb); track thumun.index) {
+        @if (thumun.vm) {
+        <div
+          class="thumun-cell"
+          [class]="thumun.vm.decay_status"
+          [class.pre-memorized]="thumun.vm.is_pre_memorized"
+          (click)="openThumunDetail(thumun.vm)"
+        >
+          <span class="thumun-num">{{ thumun.index }}</span>
+        </div>
+        } @else {
+        <div class="thumun-cell" style="background:rgba(0,0,0,0.07);">
+          <span class="thumun-num" style="color:#aaa">{{ thumun.index }}</span>
+        </div>
+        }
+        }
+      </div>
+      }
+
+    </div>
+    }
+  </div>
+  }
+
+  } <!-- end loaded -->
+
+  <!-- ── Thumun detail popover ───────────────────────────────────────── -->
+  @if (selectedThumun) {
+  <div
+    class="thumun-popover-overlay"
+    style="position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1000;display:flex;align-items:center;justify-content:center;"
+    (click)="closeThumunDetail()"
+  >
+    <div class="thumun-popover" (click)="$event.stopPropagation()">
+      <h4>الحزب {{ selectedThumun.hizb_number }} — الثُمن {{ selectedThumun.thumun_number }}</h4>
+
+      <div class="detail-row">
+        <span>متوسط التقييم</span>
+        <span>{{ selectedThumun.average_score | number:'1.1-1' }} / 4</span>
+      </div>
+      <div class="detail-row">
+        <span>مرات المراجعة</span>
+        <span>{{ selectedThumun.review_count }}</span>
+      </div>
+      <div class="detail-row">
+        <span>آخر مراجعة</span>
+        <span>{{ selectedThumun.last_graded_date ?? '—' }}</span>
+      </div>
+
+      <div class="decay-badge" [class]="selectedThumun.decay_status">
+        <ion-icon [name]="decayIcon(selectedThumun.decay_status)"></ion-icon>
+        {{ decayLabel(selectedThumun.decay_status) }}
+      </div>
+
+      @if (selectedThumun.is_pre_memorized) {
+      <p class="pre-mem-note">★ محفوظ قبل الانضمام للحلقة</p>
+      }
+
+      <ion-button
+        class="close-btn"
+        fill="clear"
+        size="small"
+        (click)="closeThumunDetail()"
+      >إغلاق</ion-button>
+    </div>
+  </div>
+  }
+
+</ng-container>

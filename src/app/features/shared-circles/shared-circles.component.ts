@@ -1,4 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
+import { Output, EventEmitter } from '@angular/core';
 import {
   IonCard,
   IonCardContent,
@@ -8,8 +9,14 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-  trash, shareSocial, documentText, close,
-  person, cloudUpload, checkmarkCircle, chevronBack,
+  trash,
+  shareSocial,
+  documentText,
+  close,
+  person,
+  cloudUpload,
+  checkmarkCircle,
+  chevronBack,
   cloudDownloadOutline,
 } from 'ionicons/icons';
 import {
@@ -29,12 +36,7 @@ import { Router } from '@angular/router';
   templateUrl: './shared-circles.component.html',
   styleUrls: ['./shared-circles.component.scss'],
   standalone: true,
-  imports: [
-    IonIcon,
-    IonButton,
-    IonCard,
-    IonCardContent,
-  ],
+  imports: [IonIcon, IonButton, IonCard, IonCardContent],
 })
 export class SharedCirclesComponent implements OnInit {
   constructor() {}
@@ -49,18 +51,60 @@ export class SharedCirclesComponent implements OnInit {
 
   circles: Circle[] = [];
   teacher: Teacher | null = null;
-  teachers : Teacher[] = [];
+  teachers: Teacher[] = [];
 
   selectionMode = false;
   selectedCircles: Set<string> = new Set();
   private pressTimer: any;
   private longPressActive = false;
 
+  // 1. ADD THIS OUTPUT
+  @Output() selectionState = new EventEmitter<{
+    isActive: boolean;
+    count: number;
+  }>();
+
+  // 2. ADD THIS HELPER METHOD
+  private emitSelectionState() {
+    this.selectionState.emit({
+      isActive: this.selectionMode,
+      count: this.selectedCircles.size,
+    });
+  }
+
+  // 3. UPDATE THESE THREE METHODS to call the helper
+  enableSelectionMode(circle: Circle) {
+    if (!circle.id) return;
+    this.selectionMode = true;
+    if (!this.selectedCircles.has(circle.id)) {
+      this.selectedCircles.add(circle.id);
+    }
+    this.emitSelectionState(); // <-- Added
+  }
+
+  toggleSelection(circle: Circle) {
+    if (!circle.id) return;
+    if (this.selectedCircles.has(circle.id)) {
+      this.selectedCircles.delete(circle.id);
+      if (this.selectedCircles.size === 0) {
+        this.selectionMode = false;
+      }
+    } else {
+      this.selectedCircles.add(circle.id);
+    }
+    this.emitSelectionState(); // <-- Added
+  }
+
+  cancelSelection() {
+    this.selectionMode = false;
+    this.selectedCircles.clear();
+    this.emitSelectionState(); // <-- Added
+  }
+
   async fetchSharedCircles() {
     try {
       this.circles = await this.circleRepo.findAllSharedCircles();
       console.log(this.circles);
-      
     } catch (error) {
       console.error(error);
     }
@@ -75,16 +119,16 @@ export class SharedCirclesComponent implements OnInit {
     }
   }
 
-  async fetchTeachersData(){
-    try{
+  async fetchTeachersData() {
+    try {
       this.teachers = await this.teacherRepo.findAll();
-    }catch(error){
+    } catch (error) {
       console.log(error);
     }
   }
 
-  findTeacherName(id: string){
-    return this.teachers.find((t) => t.id === id)?.name || "لا يوجد معلم";
+  findTeacherName(id: string) {
+    return this.teachers.find((t) => t.id === id)?.name || 'لا يوجد معلم';
   }
   startPress(circle: Circle) {
     this.longPressActive = false;
@@ -101,26 +145,6 @@ export class SharedCirclesComponent implements OnInit {
     clearTimeout(this.pressTimer);
   }
 
-  enableSelectionMode(circle: Circle) {
-    if (!circle.id) return;
-    this.selectionMode = true;
-    if (!this.selectedCircles.has(circle.id)) {
-      this.selectedCircles.add(circle.id);
-    }
-  }
-
-  toggleSelection(circle: Circle) {
-    if (!circle.id) return;
-    if (this.selectedCircles.has(circle.id)) {
-      this.selectedCircles.delete(circle.id);
-      if (this.selectedCircles.size === 0) {
-        this.selectionMode = false;
-      }
-    } else {
-      this.selectedCircles.add(circle.id);
-    }
-  }
-
   onCardClick(circle: Circle) {
     if (this.longPressActive) {
       return;
@@ -132,14 +156,7 @@ export class SharedCirclesComponent implements OnInit {
     }
   }
 
-  cancelSelection() {
-    this.selectionMode = false;
-    this.selectedCircles.clear();
-  }
-
-
-
-    async deleteSelected() {
+  async deleteSelected() {
     const count = this.selectedCircles.size;
     const label = count === 1 ? 'هذه الحلقة' : `${count} حلقات`;
 
@@ -163,23 +180,22 @@ export class SharedCirclesComponent implements OnInit {
               await this.fetchSharedCircles();
               this.cancelSelection();
             }
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
     await alert.present();
   }
-
 
   async shareSelected() {
     if (this.selectedCircles.size === 0) return;
     if (this.selectedCircles.size === 1) {
       await this.jsonService.generateJson(
-        this.selectedCircles.values().next().value!,
+        this.selectedCircles.values().next().value!
       );
     } else {
       await this.jsonService.generateMultipleCirclesJson(
-        Array.from(this.selectedCircles),
+        Array.from(this.selectedCircles)
       );
     }
   }
@@ -207,23 +223,27 @@ export class SharedCirclesComponent implements OnInit {
           circlesData = [data];
         }
 
-        for (const circleData of circlesData) {          
+        for (const circleData of circlesData) {
           await this.jsonService.importCircleData(circleData);
         }
         await this.fetchSharedCircles();
         await this.fetchTeachersData();
-        this.alertCtrl.create({
-          header: 'نجاح',
-          message: 'تم استيراد البيانات بنجاح',
-          buttons: ['حسنا']
-        }).then(a => a.present());
+        this.alertCtrl
+          .create({
+            header: 'نجاح',
+            message: 'تم استيراد البيانات بنجاح',
+            buttons: ['حسنا'],
+          })
+          .then((a) => a.present());
       } catch (err) {
         console.error(err);
-        this.alertCtrl.create({
-          header: 'خطأ',
-          message: 'فشل استيراد الملف. تأكد من صحة الملف.',
-          buttons: ['حسنا']
-        }).then(a => a.present());
+        this.alertCtrl
+          .create({
+            header: 'خطأ',
+            message: 'فشل استيراد الملف. تأكد من صحة الملف.',
+            buttons: ['حسنا'],
+          })
+          .then((a) => a.present());
       }
     };
     reader.readAsText(file);
@@ -260,8 +280,9 @@ export class SharedCirclesComponent implements OnInit {
               const allHomeworks: any[] = [];
 
               for (const circleId of this.selectedCircles) {
-                const students =
-                  await this.studentRepo.findByCircleId(circleId);
+                const students = await this.studentRepo.findByCircleId(
+                  circleId
+                );
                 allStudents.push(...students);
                 for (const st of students) {
                   if (st.id) {
@@ -284,12 +305,12 @@ export class SharedCirclesComponent implements OnInit {
               if (this.selectedCircles.size === 1) {
                 await this.excelService.generateCircleExcel(
                   allStudents,
-                  filteredHomeworks,
+                  filteredHomeworks
                 );
               } else {
                 await this.excelService.generateMultipleCirclesExcel(
                   allStudents,
-                  filteredHomeworks,
+                  filteredHomeworks
                 );
               }
             }
@@ -304,8 +325,12 @@ export class SharedCirclesComponent implements OnInit {
     this.fetchTeacherData();
     this.fetchTeachersData();
     addIcons({
-      trash, shareSocial, documentText, close,
-      person, 'cloud-upload': cloudUpload,
+      trash,
+      shareSocial,
+      documentText,
+      close,
+      person,
+      'cloud-upload': cloudUpload,
       'checkmark-circle': checkmarkCircle,
       'chevron-back': chevronBack,
       'cloud-download-outline': cloudDownloadOutline,

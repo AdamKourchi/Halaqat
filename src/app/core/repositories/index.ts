@@ -6,3 +6,4 @@ export { StudentRepository }                 from './student.repository';
 export { HomeworkRepository }                from './homework.repository';
 export { StudentMushafProgressRepository }   from './student-mushaf-progress.repository';
 export { QuranRepository }                   from './quran.repository';
+export { QuranDivisionRepository }           from './quran-division.repository';

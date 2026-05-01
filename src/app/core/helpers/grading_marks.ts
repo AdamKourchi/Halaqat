@@ -9,7 +9,9 @@ export class GradingMarksHelper {
     { key: 'Very Good', value: 'جيد جدا' },
     { key: 'Good', value: 'جيد' },
     { key: 'Needs Work', value: 'حسن' },
+    { key: 'Repeat', value: 'يعيد' },
     { key: 'Absent', value: 'غائب' },
+
   ];
 
   getMarkLabel(mark: string|null|undefined): string {
@@ -23,6 +25,8 @@ export class GradingMarksHelper {
         return 'جيد';
       case 'Needs Work':
         return 'حسن';
+      case 'Repeat':
+        return 'يعيد';
       case 'Absent':
         return 'غائب';
       default:

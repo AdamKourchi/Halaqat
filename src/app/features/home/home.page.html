@@ -4,7 +4,11 @@
       <span class="app-brand">حَلَقات</span>
     </ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="openGlobalExtractModal()" fill="clear" id="extract-btn">
+      <ion-button
+        (click)="openGlobalExtractModal()"
+        fill="clear"
+        id="extract-btn"
+      >
         <ion-icon slot="icon-only" name="document-text-outline"></ion-icon>
       </ion-button>
       <ion-button (click)="openSettings($event)" fill="clear" id="settings-btn">
@@ -14,7 +18,11 @@
   </ion-toolbar>
 
   <ion-toolbar>
-    <ion-segment [value]="segmentValue" (ionChange)="segmentChanged($event)" mode="md">
+    <ion-segment
+      [value]="segmentValue"
+      (ionChange)="segmentChanged($event)"
+      mode="md"
+    >
       <ion-segment-button value="mine">
         <ion-label>الخاصة</ion-label>
       </ion-segment-button>
@@ -51,7 +59,10 @@
             [name]="themeService.isDark() ? 'moon-outline' : 'sunny-outline'"
             class="row-icon"
           ></ion-icon>
-          <span>{{ themeService.isDark() ? 'الوضع الليلي' : 'الوضع النهاري' }}</span>
+          <span
+            >{{ themeService.isDark() ? 'الوضع الليلي' : 'الوضع النهاري'
+            }}</span
+          >
         </div>
         <ion-toggle
           [checked]="themeService.isDark()"
@@ -66,8 +77,69 @@
 
 <ion-content fixed-slot-placement="before">
   @if (segmentValue === 'mine') {
-    <app-my-circles></app-my-circles>
+  <app-my-circles
+    (selectionState)="onSelectionStateChange($event)"
+  ></app-my-circles>
   } @else if (segmentValue === 'shared') {
-    <app-shared-circles></app-shared-circles>
+  <app-shared-circles
+    (selectionState)="onSelectionStateChange($event)"
+  ></app-shared-circles>
   }
 </ion-content>
+
+<!-- The Footer lives in the parent, reacting to the child's state -->
+@if (isSelectionActive) {
+
+<ion-tab-bar slot="bottom">
+  @if ( segmentValue == "shared") {
+  <ion-tab-button (click)="triggerDeleteShared()">
+    <ion-icon name="trash"></ion-icon>
+    حذف
+  </ion-tab-button>
+  } @else {
+  <ion-tab-button (click)="triggerDelete()">
+    <ion-icon name="trash"></ion-icon>
+    حذف
+  </ion-tab-button>
+  } @if ( segmentValue == "shared") {
+  <ion-tab-button (click)="triggerSummaryShared()">
+    <ion-icon name="document-text"></ion-icon>
+    تقرير
+  </ion-tab-button>
+  } @else {
+  <ion-tab-button (click)="triggerSummary()">
+    <ion-icon name="document-text"></ion-icon>
+    تقرير
+  </ion-tab-button>
+  } @if ( segmentValue == "shared") {
+  <ion-tab-button (click)="triggerShareShared()">
+    <ion-icon name="share-social"></ion-icon>
+    مشاركة
+  </ion-tab-button>
+  } @else {
+  <ion-tab-button (click)="triggerShare()">
+    <ion-icon name="share-social"></ion-icon>
+    مشاركة
+  </ion-tab-button>
+  } @if ( selectedCount === 1 && segmentValue=="mine") {
+  <ion-tab-button (click)="triggerEdit()">
+    <ion-icon name="pencil"></ion-icon>
+    تفاصيل
+  </ion-tab-button>
+
+  } @if (segmentValue == "shared" ) {
+  <ion-tab-button (click)="triggerCancelShared()">
+    <ion-icon name="close"></ion-icon>
+    إلغاء
+  </ion-tab-button>
+  } @else {
+  <ion-tab-button (click)="triggerCancel()">
+    <ion-icon name="close"></ion-icon>
+    إلغاء
+  </ion-tab-button>
+  }
+</ion-tab-bar>
+
+}@else{
+<ion-footer style="height: 50px"></ion-footer>
+}

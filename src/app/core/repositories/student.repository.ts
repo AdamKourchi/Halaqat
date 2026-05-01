@@ -42,12 +42,13 @@ export class StudentRepository extends BaseRepository {
     name: string,
     gender: string,
     parentName?: string,
-    parentContact?: string
+    parentContact?: string,
+    medicalIssues?: string
   ): Promise<string> {
     const id = this.uuidHelper.generate();
     await this.run(
-      `INSERT INTO students (id, circle_id, name, gender, enlistment_date, parent_name, parent_contact)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO students (id, circle_id, name, gender, enlistment_date, parent_name, parent_contact, medical_issues)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
         circleId,
@@ -56,6 +57,7 @@ export class StudentRepository extends BaseRepository {
         new Date().toISOString().split('T')[0],
         parentName ?? null,
         parentContact ?? null,
+        medicalIssues ?? null
       ]
     );
     return id;

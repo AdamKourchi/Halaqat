@@ -1,0 +1,103 @@
+// ── Info card ──────────────────────────────────────────────────────────────
+.info-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(var(--ion-color-primary-rgb, 63, 81, 181), 0.08);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  direction: rtl;
+
+  ion-icon {
+    font-size: 1.6rem;
+    color: var(--ion-color-primary, #3f51b5);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.84rem;
+    line-height: 1.6;
+    color: var(--ion-text-color, #222);
+  }
+}
+
+// ── Section label ─────────────────────────────────────────────────────────
+.section-label {
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ion-color-medium, #888);
+  margin: 0 0 8px;
+}
+
+// ── Quick range row ───────────────────────────────────────────────────────
+.range-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+
+  .range-item {
+    flex: 1;
+    min-width: 120px;
+    --border-radius: 12px;
+    --background: var(--ion-item-background, #f4f5f8);
+  }
+
+  .range-sep {
+    font-size: 1.1rem;
+    color: var(--ion-color-medium, #aaa);
+  }
+}
+
+// ── Hizb list ────────────────────────────────────────────────────────────
+.hizb-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hizb-row {
+  background: var(--ion-card-background, #fff);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1.5px solid transparent;
+  transition: border-color 0.2s;
+
+  &.has-selection {
+    border-color: var(--ion-color-primary, #3f51b5);
+  }
+}
+
+.hizb-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+
+  ion-checkbox {
+    font-size: 0.9rem;
+  }
+}
+
+.thumun-checks {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  padding: 0 14px 12px;
+
+  .thumun-check {
+    font-size: 0.78rem;
+  }
+}
+
+// ── Footer ────────────────────────────────────────────────────────────────
+ion-footer ion-toolbar {
+  --background: var(--ion-background-color, #fff);
+  --border-top: 1px solid var(--ion-border-color, #e0e0e0);
+}
