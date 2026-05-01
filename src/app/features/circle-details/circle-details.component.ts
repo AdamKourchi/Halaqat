@@ -44,7 +44,8 @@ import {
   chevronBack,
   checkmarkCircle,
   bookOutline,
-  accessibilityOutline
+  accessibilityOutline,
+  book
 } from 'ionicons/icons';
 import { CreateStudentComponent } from './components/create-student/create-student.component';
 import { StudentHomeworkComponent } from './components/student-homework/student-homework.component';
@@ -99,7 +100,21 @@ export class CircleDetailsComponent implements OnInit {
   get isSharedCircle(): boolean {
     return this.circle?.teacher_id !== this.teacher?.id;
   }
+  private stringToHash(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return hash;
+  }
+   getAvatarColor(name: string): string {
+    const hash = this.stringToHash(name);
+    // Base hue (0-360)
+    const h1 = Math.abs(hash) % 360; 
 
+    // We use HSL to ensure the colors are bright and vibrant
+    return `hsl(${h1}, 75%, 55%)`;
+  }
   async fetchTeacher() {
     try {
       this.teacher = await this.teacherRepo.findOwner();
@@ -375,6 +390,7 @@ export class CircleDetailsComponent implements OnInit {
       'checkmark-circle': checkmarkCircle,
       'book-outline': bookOutline,
       'accessibility-outline': accessibilityOutline,
+      book
     });
     this.cancelSelection();
     await this.fetchCircle();

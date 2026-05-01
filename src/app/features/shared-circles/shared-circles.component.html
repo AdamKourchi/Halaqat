@@ -31,9 +31,12 @@
 >
   <ion-card-content>
     <div class="circle-card-inner">
-      <!-- Avatar -->
-      <div class="avatar-circle circle-avatar">
-        {{ circle.name.charAt(0) }}
+      <!-- Avatar / Icon -->
+      <div
+        class="avatar-circle circle-avatar"
+        [style.background]="getAvatarColor(circle!.name)"
+      >
+        <ion-icon name="book" style="color: white; font-size: 24px"></ion-icon>
       </div>
 
       <!-- Info -->

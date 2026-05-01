@@ -13,8 +13,12 @@
   <!-- ── Circle Header ──────────────────────── -->
   <div class="circle-header">
     <div class="circle-header-info">
-      <div class="avatar-circle circle-detail-avatar">
-        {{ circle?.name?.charAt(0) }}
+      <!-- Avatar / Icon -->
+      <div
+        class="avatar-circle circle-avatar"
+        [style.background]="getAvatarColor(circle!.name)"
+      >
+        <ion-icon name="book" style="color: white; font-size: 24px"></ion-icon>
       </div>
       <div>
         <h2 class="circle-detail-name">{{ circle?.name }}</h2>
@@ -151,12 +155,12 @@
     <ion-icon name="book-outline"></ion-icon>
     واجبات
   </ion-tab-button>
-  
-}
-<ion-tab-button fill="clear" color="medium" (click)="cancelSelection()">
-  <ion-icon name="close"></ion-icon>
-      إلغاء
-</ion-tab-button>
+
+  }
+  <ion-tab-button fill="clear" color="medium" (click)="cancelSelection()">
+    <ion-icon name="close"></ion-icon>
+    إلغاء
+  </ion-tab-button>
 </ion-tab-bar>
 }@else{
 

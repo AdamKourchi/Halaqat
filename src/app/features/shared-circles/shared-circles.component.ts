@@ -18,6 +18,7 @@ import {
   checkmarkCircle,
   chevronBack,
   cloudDownloadOutline,
+  book,
 } from 'ionicons/icons';
 import {
   CircleRepository,
@@ -80,6 +81,22 @@ export class SharedCirclesComponent implements OnInit {
       this.selectedCircles.add(circle.id);
     }
     this.emitSelectionState(); // <-- Added
+  }
+
+  private stringToHash(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return hash;
+  }
+  getAvatarColor(name: string): string {
+    const hash = this.stringToHash(name);
+    // Base hue (0-360)
+    const h1 = Math.abs(hash) % 360;
+
+    // We use HSL to ensure the colors are bright and vibrant
+    return `hsl(${h1}, 75%, 55%)`;
   }
 
   toggleSelection(circle: Circle) {
@@ -334,6 +351,7 @@ export class SharedCirclesComponent implements OnInit {
       'checkmark-circle': checkmarkCircle,
       'chevron-back': chevronBack,
       'cloud-download-outline': cloudDownloadOutline,
+      book,
     });
   }
 }

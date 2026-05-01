@@ -32,7 +32,6 @@ import {
   IonCardHeader,
   IonCardTitle,
   IonCardContent,
-  IonFooter,
 } from '@ionic/angular/standalone';
 
 @Component({
@@ -55,8 +54,7 @@ import {
     IonCard,
     IonCardHeader,
     IonCardTitle,
-    IonCardContent,
-    IonFooter,
+    IonCardContent
   ],
 })
 export class HomeworksComponent implements OnInit {
