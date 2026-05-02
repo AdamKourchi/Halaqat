@@ -190,6 +190,7 @@ export class MyCirclesComponent implements OnInit {
   }
 
   onCardClick(circle: Circle) {
+    
     if (this.longPressActive) {
       return;
     }

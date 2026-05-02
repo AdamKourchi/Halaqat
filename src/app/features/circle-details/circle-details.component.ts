@@ -27,7 +27,7 @@ import {
   IonSegmentButton,
   IonFooter,
   IonTabBar,
-  IonTabButton
+  IonTabButton,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -45,7 +45,7 @@ import {
   checkmarkCircle,
   bookOutline,
   accessibilityOutline,
-  book
+  book,
 } from 'ionicons/icons';
 import { CreateStudentComponent } from './components/create-student/create-student.component';
 import { StudentHomeworkComponent } from './components/student-homework/student-homework.component';
@@ -67,7 +67,7 @@ import { StudentProfileComponent } from '../student-profile/student-profile.comp
     IonSegmentButton,
     IonFooter,
     IonTabBar,
-    IonTabButton
+    IonTabButton,
   ],
   selector: 'app-circle-details',
   templateUrl: './circle-details.component.html',
@@ -107,10 +107,10 @@ export class CircleDetailsComponent implements OnInit {
     }
     return hash;
   }
-   getAvatarColor(name: string): string {
+  getAvatarColor(name: string): string {
     const hash = this.stringToHash(name);
     // Base hue (0-360)
-    const h1 = Math.abs(hash) % 360; 
+    const h1 = Math.abs(hash) % 360;
 
     // We use HSL to ensure the colors are bright and vibrant
     return `hsl(${h1}, 75%, 55%)`;
@@ -146,8 +146,10 @@ export class CircleDetailsComponent implements OnInit {
 
   async fetchStudents() {
     try {
-      const students = await this.studentRepo.findByCircleId(this.circle?.id!);
+      // Change this to use this.circleId instead of this.circle?.id
+      const students = await this.studentRepo.findByCircleId(this.circleId);
       this.students = students;
+      this.applyFilter(); // We'll add this in step 2
     } catch (error) {
       console.log(error);
     }
@@ -341,9 +343,7 @@ export class CircleDetailsComponent implements OnInit {
       );
       const allHomeworks: any[] = [];
       for (const student of studentsList) {
-        const hws = await this.homeworkRepo.findByStudentId(
-          student.id!
-        );
+        const hws = await this.homeworkRepo.findByStudentId(student.id!);
         allHomeworks.push(...hws);
       }
       const start = new Date(data.startDate).getTime();
@@ -390,13 +390,16 @@ export class CircleDetailsComponent implements OnInit {
       'checkmark-circle': checkmarkCircle,
       'book-outline': bookOutline,
       'accessibility-outline': accessibilityOutline,
-      book
+      book,
     });
     this.cancelSelection();
-    await this.fetchCircle();
-    this.fetchTeacher();
-    this.fetchTeachers();
-    this.fetchStudents();
+
+    await Promise.all([
+      this.fetchCircle(),
+      this.fetchTeacher(),
+      this.fetchTeachers(),
+      this.fetchStudents(),
+    ]);
   }
 
   // Filter state
@@ -408,8 +411,25 @@ export class CircleDetailsComponent implements OnInit {
     | 'not_graded'
     | 'no_homework' = 'all';
 
-  get filteredStudents(): Student[] {
-    return this.students.filter((student) => {
+  // get filteredStudents(): Student[] {
+  //   return this.students.filter((student) => {
+  //     if (this.filterType === 'all') return true;
+  //     if (this.filterType === 'Male') return student.gender === 'Male';
+  //     if (this.filterType === 'Female') return student.gender === 'Female';
+  //     if (this.filterType === 'not_graded')
+  //       return !!student.has_ungraded_homework && !student.is_graded_today;
+  //     if (this.filterType === 'graded_today') return !!student.is_graded_today;
+  //     if (this.filterType === 'no_homework')
+  //       return !student.has_ungraded_homework && !student.is_graded_today;
+  //     return true;
+  //   });
+  // }
+
+  filteredStudentsList: Student[] = [];
+
+  // Call this inside fetchStudents() and setFilter()
+  applyFilter() {
+    this.filteredStudentsList = this.students.filter((student) => {
       if (this.filterType === 'all') return true;
       if (this.filterType === 'Male') return student.gender === 'Male';
       if (this.filterType === 'Female') return student.gender === 'Female';
@@ -424,6 +444,7 @@ export class CircleDetailsComponent implements OnInit {
 
   setFilter(type: any) {
     this.filterType = type;
+    this.applyFilter();
   }
 
   async openStudentHomeworkModal(student: Student) {
