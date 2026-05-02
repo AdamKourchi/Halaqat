@@ -20,6 +20,8 @@ import {
   IonSegmentButton,
   IonLabel,
   IonToggle,
+  IonNote,
+  IonPopover
 } from '@ionic/angular/standalone';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
@@ -45,6 +47,7 @@ import {
   musicalNotesOutline,
   trashOutline,
   micCircleOutline,
+  helpCircleOutline,
 } from 'ionicons/icons';
 import {
   Student,
@@ -90,6 +93,8 @@ const DIVISION_OPTIONS: { count: ThumunCount; label: string }[] = [
     IonSegmentButton,
     IonLabel,
     IonToggle,
+    IonNote,
+    IonPopover
   ],
   selector: 'app-student-homework',
   templateUrl: './student-homework.component.html',
@@ -152,9 +157,8 @@ export class StudentHomeworkComponent implements OnInit {
   selectedAudioFile: File | null = null;
   isRecording = false;
   recordingTime = 0;
-  private mediaRecorder: MediaRecorder | null = null;
-  private audioChunks: Blob[] = [];
   private recordingTimer: any;
+  isOpen = false;
 
   // ── Computed helpers ─────────────────────────────────────────────────
 
@@ -166,6 +170,11 @@ export class StudentHomeworkComponent implements OnInit {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     return this.quranPassage.slice(startIndex, startIndex + this.itemsPerPage);
   }
+
+
+presentPopover(e: Event) {
+  this.isOpen = true;
+}
 
   /**
    * The list of sub-divisions to show (e.g. for Half: 2 items;
@@ -216,6 +225,7 @@ export class StudentHomeworkComponent implements OnInit {
       'musical-notes-outline': musicalNotesOutline,
       'trash-outline': trashOutline,
       'mic-circle-outline': micCircleOutline,
+      'help-circle-outline': helpCircleOutline,
     });
     this.surahs = await this.quranRepo.getAllSurahs();
     await this.loadUngradedHomework();

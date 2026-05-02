@@ -125,11 +125,18 @@
               autoGrow="true"
             ></ion-textarea>
           </ion-item>
-          
+
           <ion-item class="grade-item">
-            <ion-icon name="logo-whatsapp" slot="start" color="success"></ion-icon>
+            <ion-icon
+              name="logo-whatsapp"
+              slot="start"
+              color="success"
+            ></ion-icon>
             <ion-label>مشاركة التقييم عبر واتساب</ion-label>
-            <ion-toggle [(ngModel)]="shareGradeViaWhatsapp" slot="end"></ion-toggle>
+            <ion-toggle
+              [(ngModel)]="shareGradeViaWhatsapp"
+              slot="end"
+            ></ion-toggle>
           </ion-item>
         </ion-list>
 
@@ -312,45 +319,167 @@
       <ion-list lines="none" class="grade-list">
         <ion-item class="grade-item">
           <ion-icon name="mic-outline" slot="start" color="medium"></ion-icon>
-          <div class="audio-input-container" style="width: 100%; display: flex; flex-direction: column; padding: 12px 0;">
-            <ion-label style="margin-bottom: 8px;">إرفاق رسالة صوتية</ion-label>
-            
+          <div
+            class="audio-input-container"
+            style="
+              width: 100%;
+              display: flex;
+              flex-direction: column;
+              padding: 12px 0;
+            "
+          >
+            <div
+              style="
+                display: flex;
+                justify-content: flex-start;
+                gap: 5px;
+                align-items: center;
+                flex-direction: row;
+              "
+            >
+              <ion-label>إرفاق رسالة صوتية</ion-label>
+              
+              <ion-button fill="clear" shape="round" (click)="presentPopover($event)">
+                <ion-icon
+                  slot="icon-only"
+                  name="help-circle-outline"
+                ></ion-icon>
+              </ion-button>
+            </div>
+
+
+        <ion-popover #popover [isOpen]="isOpen" (didDismiss)="isOpen = false">
+          <ng-template>
+            <ion-content class="ion-padding">
+              بسبب سياسات واتساب، يتوجب عليك البحث عن المتلقي يدويا عند مشاركة ملف صوتي. لتسهيل ذلك، يقوم التطبيق بنسخ رقم ولي الأمر لتتمكن من لصقه مباشرة في خانة بحث واتساب.
+            </ion-content>
+          </ng-template>
+        </ion-popover>
+
             @if (!selectedAudioFile && !isRecording) {
-              <div style="display: flex; gap: 8px;">
-                <ion-button fill="outline" color="danger" size="small" (click)="startRecording()" style="flex: 1; margin: 0; --padding-start: 0; --padding-end: 0;">
-                  <ion-icon name="radio-button-on-outline" slot="start"></ion-icon>
-                  تسجيل الآن
-                </ion-button>
-                <ion-button fill="outline" color="primary" size="small" (click)="audioInput.click()" style="flex: 1; margin: 0; --padding-start: 0; --padding-end: 0;">
-                  <ion-icon name="folder-open-outline" slot="start"></ion-icon>
-                  اختيار ملف
-                </ion-button>
-              </div>
+            <div style="display: flex; gap: 8px">
+              <ion-button
+                fill="outline"
+                color="danger"
+                size="small"
+                (click)="startRecording()"
+                style="flex: 1; margin: 0; --padding-start: 0; --padding-end: 0"
+              >
+                <ion-icon
+                  name="radio-button-on-outline"
+                  slot="start"
+                ></ion-icon>
+                تسجيل الآن
+              </ion-button>
+              <ion-button
+                fill="outline"
+                color="primary"
+                size="small"
+                (click)="audioInput.click()"
+                style="flex: 1; margin: 0; --padding-start: 0; --padding-end: 0"
+              >
+                <ion-icon name="folder-open-outline" slot="start"></ion-icon>
+                اختيار ملف
+              </ion-button>
+            </div>
             } @else if (isRecording) {
-              <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(var(--ion-color-danger-rgb), 0.1); padding: 8px 12px; border-radius: 8px;">
-                <div style="display: flex; align-items: center; color: var(--ion-color-danger); font-weight: bold; font-size: 0.9rem;">
-                  <ion-icon name="radio-button-on-outline" style="margin-inline-end: 8px; animation: pulse 1.5s infinite;"></ion-icon>
-                  <span>جاري التسجيل... {{ recordingTime }}ث</span>
-                </div>
-                <ion-button fill="solid" color="danger" size="small" (click)="stopRecording()" style="margin: 0;">
-                  <ion-icon name="stop-circle-outline" slot="icon-only"></ion-icon>
-                </ion-button>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                background: rgba(var(--ion-color-danger-rgb), 0.1);
+                padding: 8px 12px;
+                border-radius: 8px;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  color: var(--ion-color-danger);
+                  font-weight: bold;
+                  font-size: 0.9rem;
+                "
+              >
+                <ion-icon
+                  name="radio-button-on-outline"
+                  style="margin-inline-end: 8px; animation: pulse 1.5s infinite"
+                ></ion-icon>
+                <span>جاري التسجيل... {{ recordingTime }}ث</span>
               </div>
+              <ion-button
+                fill="solid"
+                color="danger"
+                size="small"
+                (click)="stopRecording()"
+                style="margin: 0"
+              >
+                <ion-icon
+                  name="stop-circle-outline"
+                  slot="icon-only"
+                ></ion-icon>
+              </ion-button>
+            </div>
             } @else {
-              <div class="selected-file-chip" style="display: flex; align-items: center; background: rgba(var(--ion-color-primary-rgb), 0.05); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);">
-                <ion-icon name="musical-notes-outline" color="primary" style="margin-inline-end: 8px;"></ion-icon>
-                <span style="flex: 1; font-size: 0.85rem; color: var(--ion-color-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: ltr; text-align: right;">{{ selectedAudioFile?.name || 'تم إرفاق ملف صوتي' }}</span>
-                <ion-button fill="clear" color="danger" size="small" (click)="clearAudio()" style="margin: 0;">
-                  <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-                </ion-button>
-              </div>
+            <div
+              class="selected-file-chip"
+              style="
+                display: flex;
+                align-items: center;
+                background: rgba(var(--ion-color-primary-rgb), 0.05);
+                padding: 8px 12px;
+                border-radius: 8px;
+                border: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);
+              "
+            >
+              <ion-icon
+                name="musical-notes-outline"
+                color="primary"
+                style="margin-inline-end: 8px"
+              ></ion-icon>
+              <span
+                style="
+                  flex: 1;
+                  font-size: 0.85rem;
+                  color: var(--ion-color-primary);
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                  direction: ltr;
+                  text-align: right;
+                "
+                >{{ selectedAudioFile?.name || "تم إرفاق ملف صوتي" }}</span
+              >
+              <ion-button
+                fill="clear"
+                color="danger"
+                size="small"
+                (click)="clearAudio()"
+                style="margin: 0"
+              >
+                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+            </div>
             }
-            <input #audioInput type="file" accept="audio/*" capture="microphone" (change)="onAudioSelected($event)" style="display: none;" />
+            <input
+              #audioInput
+              type="file"
+              accept="audio/*"
+              capture="microphone"
+              (change)="onAudioSelected($event)"
+              style="display: none"
+            />
           </div>
         </ion-item>
-        
+
+
         <ion-item class="grade-item">
-          <ion-icon name="logo-whatsapp" slot="start" color="success"></ion-icon>
+          <ion-icon
+            name="logo-whatsapp"
+            slot="start"
+            color="success"
+          ></ion-icon>
           <ion-label>مشاركة الواجب عبر واتساب</ion-label>
           <ion-toggle [(ngModel)]="shareViaWhatsapp" slot="end"></ion-toggle>
         </ion-item>
