@@ -41,15 +41,7 @@ export const migration004: Migration = {
        ON student_mushaf_progress(student_id, hizb_number);`
     );
 
-    // ── Add is_pre_memorized column to homeworks ──────────────────────────
-    // SQLite doesn't support IF NOT EXISTS on ALTER TABLE, so we guard it.
-    try {
-      await db.execute(`
-        ALTER TABLE homeworks ADD COLUMN is_pre_memorized INTEGER NOT NULL DEFAULTa 0;
-      `);
-    } catch {
-      // Column already exists (hot-reload / re-run scenario) — safe to ignore
-    }
+
     },
 
   async down(db: SQLiteDBConnection): Promise<void> {
