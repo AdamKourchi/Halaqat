@@ -1,4 +1,10 @@
-import { Component, inject, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  ChangeDetectorRef,
+  ViewChild,
+} from '@angular/core';
 import {
   IonHeader,
   IonToolbar,
@@ -11,21 +17,28 @@ import {
   IonToggle,
   IonFooter,
   IonTabBar,
-  IonTabButton
+  IonTabButton,
 } from '@ionic/angular/standalone';
 import { TeacherRepository, ThemeService } from '@core';
 import { MyCirclesComponent } from '../my-circles/my-circles.component';
 import { SharedCirclesComponent } from '../shared-circles/shared-circles.component';
-import { ModalController, IonButtons, IonButton, IonIcon} from '@ionic/angular/standalone';
+import {
+  ModalController,
+  IonButtons,
+  IonButton,
+  IonIcon,
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   documentTextOutline,
   settingsOutline,
   moonOutline,
   sunnyOutline,
+  logoWhatsapp,
+  createOutline,
 } from 'ionicons/icons';
 import { GlobalExtractModalComponent } from './components/global-extract-modal/global-extract-modal.component';
-
+import { TextCustomizationModalComponent } from './components/text-customization-modal/text-customization-modal.component';
 
 @Component({
   selector: 'app-home',
@@ -48,7 +61,7 @@ import { GlobalExtractModalComponent } from './components/global-extract-modal/g
     IonToggle,
     IonFooter,
     IonTabBar,
-    IonTabButton
+    IonTabButton,
   ],
 })
 export class HomePage implements OnInit {
@@ -63,7 +76,8 @@ export class HomePage implements OnInit {
 
   // Grab a reference to the child component
   @ViewChild(MyCirclesComponent) myCirclesComponent!: MyCirclesComponent;
-  @ViewChild(SharedCirclesComponent) sharedCirclesComponent!: SharedCirclesComponent;
+  @ViewChild(SharedCirclesComponent)
+  sharedCirclesComponent!: SharedCirclesComponent;
 
   // Track the state for the UI
   isSelectionActive = false;
@@ -76,16 +90,34 @@ export class HomePage implements OnInit {
   }
 
   // Footer Button Actions (These just pass the command down to the child)
-  triggerDelete() { this.myCirclesComponent?.deleteSelected(); }
-  triggerSummary() { this.myCirclesComponent?.extractSummary(); }
-  triggerShare() { this.myCirclesComponent?.shareSelected(); }
-  triggerEdit() { this.myCirclesComponent?.editSelected(); }
-  triggerCancel() { this.myCirclesComponent?.cancelSelection(); }
+  triggerDelete() {
+    this.myCirclesComponent?.deleteSelected();
+  }
+  triggerSummary() {
+    this.myCirclesComponent?.extractSummary();
+  }
+  triggerShare() {
+    this.myCirclesComponent?.shareSelected();
+  }
+  triggerEdit() {
+    this.myCirclesComponent?.editSelected();
+  }
+  triggerCancel() {
+    this.myCirclesComponent?.cancelSelection();
+  }
 
-  triggerDeleteShared() { this.sharedCirclesComponent?.deleteSelected(); }
-  triggerSummaryShared() { this.sharedCirclesComponent?.extractSummary(); }
-  triggerShareShared() { this.sharedCirclesComponent?.shareSelected(); }
-  triggerCancelShared() { this.sharedCirclesComponent?.cancelSelection(); }
+  triggerDeleteShared() {
+    this.sharedCirclesComponent?.deleteSelected();
+  }
+  triggerSummaryShared() {
+    this.sharedCirclesComponent?.extractSummary();
+  }
+  triggerShareShared() {
+    this.sharedCirclesComponent?.shareSelected();
+  }
+  triggerCancelShared() {
+    this.sharedCirclesComponent?.cancelSelection();
+  }
 
   segmentChanged(event: any) {
     this.segmentValue = event.detail.value;
@@ -101,17 +133,24 @@ export class HomePage implements OnInit {
 
   async openGlobalExtractModal() {
     const modal = await this.modalCtrl.create({
-      component: GlobalExtractModalComponent
+      component: GlobalExtractModalComponent,
     });
     await modal.present();
   }
-
+  async openTextCustomizationModal() {
+    const modal = await this.modalCtrl.create({
+      component: TextCustomizationModalComponent,
+    });
+    await modal.present();
+  }
   async ngOnInit() {
     addIcons({
       'document-text-outline': documentTextOutline,
       'settings-outline': settingsOutline,
       'moon-outline': moonOutline,
       'sunny-outline': sunnyOutline,
+      'logo-whatsapp' : logoWhatsapp,
+      'create-outline' : createOutline
     });
     this.teacherCount = await this.teacherRepo.count();
     this.cdr.detectChanges();

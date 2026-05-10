@@ -60,8 +60,8 @@ export class HomeworkRepository extends BaseRepository {
       `INSERT INTO homeworks
          (id, student_id, circle_id, date_assigned,
           start_surah, start_ayah, end_surah, end_ayah,
-          mistakes_count, grade_mark, remark, graded_date, is_pre_memorized)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          mistakes_count, grade_mark, remark, graded_date, is_pre_memorized, is_hizb_display)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
         hw.student_id,
@@ -76,6 +76,7 @@ export class HomeworkRepository extends BaseRepository {
         hw.remark ?? null,
         null,
         hw.is_pre_memorized ?? 0,
+        hw.is_hizb_display ?? 0,
       ]
     );
     return id;
@@ -117,8 +118,8 @@ export class HomeworkRepository extends BaseRepository {
         `INSERT INTO homeworks
            (id, student_id, circle_id, date_assigned,
             start_surah, start_ayah, end_surah, end_ayah,
-            mistakes_count, grade_mark, remark, graded_date, is_pre_memorized)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            mistakes_count, grade_mark, remark, graded_date, is_pre_memorized, is_hizb_display)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           hw.id,
           hw.student_id,
@@ -133,6 +134,7 @@ export class HomeworkRepository extends BaseRepository {
           hw.remark ?? null,
           hw.graded_date ?? null,
           hw.is_pre_memorized ?? 0,
+          hw.is_hizb_display ?? 0,
         ]
       );
     }

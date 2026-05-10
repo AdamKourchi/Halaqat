@@ -64,12 +64,25 @@
             }}</span
           >
         </div>
+
         <ion-toggle
           [checked]="themeService.isDark()"
           (ionChange)="toggleTheme()"
           color="primary"
           aria-label="تبديل الوضع الليلي"
         ></ion-toggle>
+      </div>
+
+      <!-- Message Text config -->
+      <div class="settings-row">
+        <div class="settings-row-label">
+          <ion-icon name="logo-whatsapp" class="row-icon"></ion-icon>
+          <span>تخصيص الرسائل</span>
+        </div>
+        <ion-button (click)="openTextCustomizationModal()">
+          <ion-icon name="create-outline"></ion-icon>
+        </ion-button
+        >
       </div>
     </div>
   </ng-template>

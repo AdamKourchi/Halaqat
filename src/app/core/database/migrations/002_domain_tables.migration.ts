@@ -8,7 +8,8 @@ import { Migration } from './migration.interface';
  */
 export const migration002: Migration = {
   version: 2,
-  description: 'Domain tables – teachers, circles, students, homeworks, progress',
+  description:
+    'Domain tables – teachers, circles, students, homeworks, progress',
 
   async up(db: SQLiteDBConnection): Promise<void> {
     // ── teachers ───────────────────────────────────────────────────────────
@@ -61,16 +62,48 @@ export const migration002: Migration = {
         grade_mark     TEXT,
         remark         TEXT,
         graded_date    TEXT,
-        is_pre_memorized BOOLEAN NOT NULL DEFAULT 0
+        is_pre_memorized BOOLEAN NOT NULL DEFAULT 0,
+        is_hizb_display BOOLEAN NOT NULL DEFAULT 0
       );
     `);
+    // ── Message Templates ──────────────────────────────────────────────────────────
+    await db.execute(`
+  CREATE TABLE IF NOT EXISTS message_templates (
+    id TEXT PRIMARY KEY,
+    type TEXT UNIQUE NOT NULL,  
+    content TEXT NOT NULL
+  );
+`);
 
+    await db.execute(`
+      INSERT OR IGNORE INTO message_templates (id, type, content) VALUES
+      ('1', 'grading', 'السلام عليكم،
+تم تقييم تسميع الطالب {{اسم_الطالب}}:
+التقييم: {{التقييم}}
+عدد الأخطاء: {{عدد_الأخطاء}}
+ملاحظات: {{ملاحظات}}
+
+بالتوفيق!'),
+      ('2', 'assignment', 'السلام عليكم،
+تم تعيين واجب جديد للطالب {{اسم_الطالب}}:
+{{الواجب}}
+
+بالتوفيق!');
+    `);
 
     // ── indexes for common look-ups ────────────────────────────────────────
-    await db.execute(`CREATE INDEX IF NOT EXISTS idx_circles_teacher   ON circles(teacher_id);`);
-    await db.execute(`CREATE INDEX IF NOT EXISTS idx_students_circle   ON students(circle_id);`);
-    await db.execute(`CREATE INDEX IF NOT EXISTS idx_homeworks_student ON homeworks(student_id);`);
-    await db.execute(`CREATE INDEX IF NOT EXISTS idx_homeworks_circle  ON homeworks(circle_id);`);
+    await db.execute(
+      `CREATE INDEX IF NOT EXISTS idx_circles_teacher   ON circles(teacher_id);`
+    );
+    await db.execute(
+      `CREATE INDEX IF NOT EXISTS idx_students_circle   ON students(circle_id);`
+    );
+    await db.execute(
+      `CREATE INDEX IF NOT EXISTS idx_homeworks_student ON homeworks(student_id);`
+    );
+    await db.execute(
+      `CREATE INDEX IF NOT EXISTS idx_homeworks_circle  ON homeworks(circle_id);`
+    );
   },
 
   async down(db: SQLiteDBConnection): Promise<void> {

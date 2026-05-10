@@ -16,4 +16,5 @@ export interface Homework {
   remark?: string | null;
   graded_date?: string | null;
   is_pre_memorized?: number;    // 0 = standard, 1 = pre-Halaqat onboarding record
+  is_hizb_display?: number;     // 0 = standard ayah mode, 1 = hizb mode
 }

@@ -1,0 +1,79 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>إعدادات الرسائل</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Segment for Type Selection -->
+  <ion-segment
+    [(ngModel)]="selectedType"
+    (ionChange)="segmentChanged($event)"
+    class="ion-margin-bottom"
+  >
+    <ion-segment-button  value="assignment">
+      <ion-label>الواجب</ion-label>
+    </ion-segment-button>
+
+    <ion-segment-button value="grading">
+      <ion-label>التقييم</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Variable Buttons -->
+  <p>اضغط على المتغير لإضافته في النص:</p>
+
+  <div
+    class="variables-container"
+    style="display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 10px"
+    *ngIf="selectedType === 'grading'"
+  >
+    <ion-chip color="primary" (click)="insertVariable('{{اسم_الطالب}}')"
+      >👤 اسم الطالب</ion-chip
+    >
+    <ion-chip color="secondary" (click)="insertVariable('{{التقييم}}')"
+      >🔹 التقييم</ion-chip
+    >
+    <ion-chip color="tertiary" (click)="insertVariable('{{عدد_الأخطاء}}')"
+      >❌ عدد الأخطاء</ion-chip
+    >
+    <ion-chip color="warning" (click)="insertVariable('{{ملاحظات}}')"
+      >📝 ملاحظات</ion-chip
+    >
+  </div>
+
+  <div
+    class="variables-container"
+    style="display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 10px"
+    *ngIf="selectedType === 'assignment'"
+  >
+    <ion-chip color="primary" (click)="insertVariable('{{اسم_الطالب}}')"
+      >👤 اسم الطالب</ion-chip
+    >
+    <ion-chip color="tertiary" (click)="insertVariable('{{الواجب}}')"
+      >📖 الواجب</ion-chip
+    >
+  </div>
+
+  <!-- The Text Editor -->
+  <ion-item fill="outline" class="ion-margin-top">
+    <ion-label position="floating">نموذج الرسالة</ion-label>
+    <ion-textarea
+      #messageInput
+      [(ngModel)]="templateContent"
+      rows="12"
+      autoGrow="true"
+      placeholder="اكتب رسالتك هنا... (يمكنك استخدام الإيموجي وترك مسافات)"
+    >
+    </ion-textarea>
+  </ion-item>
+
+  <ion-button expand="block" class="ion-margin-top" (click)="saveTemplate()">
+    حفظ النموذج
+  </ion-button>
+</ion-content>

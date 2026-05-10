@@ -20,7 +20,6 @@ import {
   IonSegmentButton,
   IonLabel,
   IonToggle,
-  IonNote,
   IonPopover
 } from '@ionic/angular/standalone';
 import { Share } from '@capacitor/share';
@@ -61,6 +60,7 @@ import {
   ThumunCount,
   MushafProgressService,
   GradeMark,
+  MessageTemplatesRepository,
 } from '@core';
 
 /** The four subdivision sizes in display order. */
@@ -93,7 +93,6 @@ const DIVISION_OPTIONS: { count: ThumunCount; label: string }[] = [
     IonSegmentButton,
     IonLabel,
     IonToggle,
-    IonNote,
     IonPopover
   ],
   selector: 'app-student-homework',
@@ -111,6 +110,7 @@ export class StudentHomeworkComponent implements OnInit {
   private quranDivisionRepo = inject(QuranDivisionRepository);
   private gradingMarksHelper = inject(GradingMarksHelper);
   private mushafProgressService = inject(MushafProgressService);
+  private messageTemplatesRepo = inject(MessageTemplatesRepository);
 
   ungradedHomework: Homework | null = null;
   ungradedHomeworkHizbLabel: string | null = null;
@@ -437,10 +437,22 @@ presentPopover(e: Event) {
     });
   }
 
-  async sendHomeworkViaWhatsApp(startSurah: number, startAyah: number, endSurah: number, endAyah: number) {
-    const startSurahName = this.getSurahName(startSurah);
-    const endSurahName = this.getSurahName(endSurah);
-    const hwText = `السلام عليكم،\nتم تعيين واجب جديد للطالب ${this.student.name}:\nمن سورة ${startSurahName} (آية ${startAyah})\nإلى سورة ${endSurahName} (آية ${endAyah})\n\nبالتوفيق!`;
+  async sendHomeworkViaWhatsApp(startSurah: number, startAyah: number, endSurah: number, endAyah: number, isHizbDisplay: boolean) {
+    let hwTextDescription = '';
+    if (isHizbDisplay) {
+      hwTextDescription = await this.getThumunFromAya(startSurah, startAyah, endSurah, endAyah) || '';
+    } else {
+      const startSurahName = this.getSurahName(startSurah);
+      const endSurahName = this.getSurahName(endSurah);
+      hwTextDescription = `من سورة ${startSurahName} (آية ${startAyah})\nإلى سورة ${endSurahName} (آية ${endAyah})`;
+    }
+    
+    const hwData = {
+      'اسم_الطالب': this.student.name,
+      'الواجب': hwTextDescription
+    };
+
+    const hwText = await this.messageTemplatesRepo.generateWhatsAppMessage('assignment', hwData);
 
     const phone = this.student.parent_contact;
 
@@ -486,10 +498,14 @@ presentPopover(e: Event) {
     const phone = this.student.parent_contact;
     const gradeLabel = this.grades.find(g => g.key === this.gradeMark)?.value || this.gradeMark;
     
-    let text = `السلام عليكم،\nتم تقييم تسميع الطالب ${this.student.name}:\nالتقييم: ${gradeLabel}\nعدد الأخطاء: ${this.mistakesCount}`;
-    if (this.remark) {
-      text += `\nملاحظات: ${this.remark}`;
-    }
+    const gradeData = {
+      'اسم_الطالب': this.student.name,
+      'التقييم': gradeLabel,
+      'عدد_الأخطاء': String(this.mistakesCount),
+      'ملاحظات': this.remark || ''
+    };
+
+    const text = await this.messageTemplatesRepo.generateWhatsAppMessage('grading', gradeData);
 
     if (phone) {
       window.open(`whatsapp://send?phone=${phone}&text=${encodeURIComponent(text)}`, '_system');
@@ -566,10 +582,11 @@ presentPopover(e: Event) {
         start_ayah:  startAyah,
         end_surah:   endSurah,
         end_ayah:    endAyah,
+        is_hizb_display: this.assignMode === 'hizb' ? 1 : 0,
       });
 
       if (this.shareViaWhatsapp) {
-        await this.sendHomeworkViaWhatsApp(startSurah, startAyah, endSurah, endAyah);
+        await this.sendHomeworkViaWhatsApp(startSurah, startAyah, endSurah, endAyah, this.assignMode === 'hizb');
       }
 
       await this.loadUngradedHomework();
